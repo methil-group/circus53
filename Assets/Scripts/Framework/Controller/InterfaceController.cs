@@ -1,0 +1,60 @@
+using Framework.Controller.Interfaces;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+
+namespace Framework.Controller
+{
+    public class InterfaceController<T> : BaseController<T>, IInterfaceController 
+        where T : InterfaceController<T>
+    {
+        [SerializeField] protected GameObject panel;
+        [SerializeField] protected Image blackPanel;
+
+        public UnityAction onPanelOpen;
+        public UnityAction onPanelClose;
+
+        public bool IsOpen => panel != null && panel.activeSelf;
+
+        public virtual void Start()
+        {
+            if (panel != null)
+                panel.SetActive(false);
+
+            if (blackPanel != null)
+                blackPanel.color = new Color(0, 0, 0, 0);
+        }
+
+        public virtual bool CanOpen() => true;
+
+        public virtual void OpenPanel()
+        {
+            if (!CanOpen() || panel == null) return;
+
+            if (blackPanel != null)
+            {
+                LeanTween.cancel(blackPanel.gameObject);
+                LeanTween.color(blackPanel.GetComponent<RectTransform>(), new Color(0, 0, 0, 0.6f), 0.6f)
+                    .setEaseOutCirc();
+            }
+
+            onPanelOpen?.Invoke();
+            panel.SetActive(true);
+        }
+
+        public virtual void ClosePanel()
+        {
+            if (!IsOpen || panel == null) return;
+
+            if (blackPanel != null)
+            {
+                LeanTween.cancel(blackPanel.gameObject);
+                LeanTween.color(blackPanel.GetComponent<RectTransform>(), new Color(0, 0, 0, 0), 0.6f)
+                    .setEaseOutCirc();
+            }
+
+            onPanelClose?.Invoke();
+            panel.SetActive(false);
+        }
+    }
+}
