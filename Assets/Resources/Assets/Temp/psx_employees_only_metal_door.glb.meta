@@ -1,25 +1,15 @@
 fileFormatVersion: 2
-guid: cd13c541f1a84924493045bc4070d804
+guid: 9cbe7f4282ca0d345a3bf275e1efde3d
 ScriptedImporter:
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Props
-    second: {fileID: 2100000, guid: c0e535ef3f68b444997240cd8ce86998, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Warehouse
-    second: {fileID: 2100000, guid: 0200c57ca30b4d647aafb0d8dc78f5d7, type: 2}
+  externalObjects: {}
   serializedVersion: 2
   userData: 
   assetBundleName: 
   assetBundleVariant: 
   script: {fileID: 11500000, guid: 804e1ce4c496647cfa3f1a1134187c71, type: 3}
   _removeEmptyRootObjects: 1
-  _scaleFactor: 1.5
+  _scaleFactor: 2
   _deduplicateResources: 0
   _deduplicatedStatistics:
     meshCountBefore: 0
@@ -48,9 +38,9 @@ ScriptedImporter:
   _enableGpuInstancing: 0
   _texturesReadWriteEnabled: 1
   _generateMipMaps: 1
-  _useSceneNameIdentifier: 0
+  _useSceneNameIdentifier: 1
   _textureCompression: -50
-  _gltfAsset: '<b>Generator: </b>Sketchfab-17.14.0
+  _gltfAsset: '<b>Generator: </b>Sketchfab-16.12.0
 
     <b>Version: </b>2.0
 
@@ -62,11 +52,9 @@ ScriptedImporter:
 '
   optimizeGameObjects: 0
   materials:
-  - {fileID: -4196916136776456594, guid: cd13c541f1a84924493045bc4070d804, type: 3}
-  - {fileID: -8048273588098311674, guid: cd13c541f1a84924493045bc4070d804, type: 3}
+  - {fileID: -2840136634868304333, guid: 9cbe7f4282ca0d345a3bf275e1efde3d, type: 3}
   textures:
-  - {fileID: 6983701643236107813, guid: cd13c541f1a84924493045bc4070d804, type: 3}
-  - {fileID: 8022499087761476943, guid: cd13c541f1a84924493045bc4070d804, type: 3}
+  - {fileID: 6983701643236107813, guid: 9cbe7f4282ca0d345a3bf275e1efde3d, type: 3}
   hasSceneData: 1
   hasAnimationData: 0
   hasMaterialData: 1
@@ -74,11 +62,8 @@ ScriptedImporter:
   animations: []
   _extensions: []
   _textures:
-  - texture: {fileID: 6983701643236107813, guid: cd13c541f1a84924493045bc4070d804, type: 3}
+  - texture: {fileID: 6983701643236107813, guid: 9cbe7f4282ca0d345a3bf275e1efde3d, type: 3}
     shouldBeLinear: 0
     shouldBeNormalMap: 0
-  - texture: {fileID: 8022499087761476943, guid: cd13c541f1a84924493045bc4070d804, type: 3}
-    shouldBeLinear: 0
-    shouldBeNormalMap: 0
-  _mainAssetIdentifier: main asset
+  _mainAssetIdentifier: scenes/Sketchfab_Scene
   _importPlugins: []
