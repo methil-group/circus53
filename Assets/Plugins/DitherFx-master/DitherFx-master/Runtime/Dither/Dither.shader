@@ -5,8 +5,8 @@ Shader "Hidden/VolFx/Dither"
         Cull Off
         ZWrite Off
         ZTest Always
-        ZClip false
             
+
         Pass    // 0
         {
             Name "Dither"

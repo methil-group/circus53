@@ -146,8 +146,16 @@ namespace VolFx
             
             if (_paletteCash.TryGetValue(palette, out var paletteCash) == false)
             {
-                paletteCash = LutGenerator.Generate(palette, _lutSize, _gamma);
-                _paletteCash.Add(palette, paletteCash);
+                try
+                {
+                    paletteCash = LutGenerator.Generate(palette, _lutSize, _gamma);
+                    _paletteCash.Add(palette, paletteCash);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[DitherFx] Failed to generate palette LUT (WebGL safe fallback): {e.Message}");
+                    return false;
+                }
             }
             
             var _palette = paletteCash._palette;
@@ -194,8 +202,11 @@ namespace VolFx
             {
                 _validateNoise();
                 
-                mat.SetTexture(s_DitherTex, _noiseTex);
-                mat.SetVector(s_DitherMad, new Vector4(_noiseScale, _noiseScale, _ditherMad.z, _ditherMad.w));
+                if (_noiseTex != null)
+                {
+                    mat.SetTexture(s_DitherTex, _noiseTex);
+                    mat.SetVector(s_DitherMad, new Vector4(_noiseScale, _noiseScale, _ditherMad.z, _ditherMad.w));
+                }
             }
 
             return true;
@@ -257,24 +268,40 @@ namespace VolFx
             
             void _validateNoise()
             {
-                var width  = Screen.width;
-                var height = Screen.height;
-                
-                if (_noiseTex == null || _noiseTex.width != width || _noiseTex.height != height)
+                try
                 {
-                    _noiseTex            = new Texture2D(width, height);
-                    _noiseTex.filterMode = FilterMode.Point;
-                    _noiseTex.wrapMode   = TextureWrapMode.Repeat;
-                    
-                    var pix = new Color[_noiseTex.width * _noiseTex.height];
-                    for (var n = 0; n < _noiseTex.width * _noiseTex.height; n++)
-                    {
-                        var val = Random.value > .5 ? 1f : 0f;
-                        pix[n] = new Color(val, val, val, 1f);
-                    }
+                    var width  = Screen.width;
+                    var height = Screen.height;
 
-                    _noiseTex.SetPixels(pix);
-                    _noiseTex.Apply();
+#if UNITY_WEBGL
+                    // Reduce noise texture resolution on WebGL to avoid frame hitch
+                    // (SetPixels/Apply is synchronous and expensive on this platform)
+                    const int maxSize = 512;
+                    if (width > maxSize)  { height = Mathf.RoundToInt(height * (maxSize / (float)width)); width = maxSize; }
+                    if (height > maxSize) { width  = Mathf.RoundToInt(width  * (maxSize / (float)height)); height = maxSize; }
+#endif
+
+                    if (_noiseTex == null || _noiseTex.width != width || _noiseTex.height != height)
+                    {
+                        _noiseTex            = new Texture2D(width, height);
+                        _noiseTex.filterMode = FilterMode.Point;
+                        _noiseTex.wrapMode   = TextureWrapMode.Repeat;
+                        
+                        var pix = new Color[_noiseTex.width * _noiseTex.height];
+                        for (var n = 0; n < _noiseTex.width * _noiseTex.height; n++)
+                        {
+                            var val = Random.value > .5 ? 1f : 0f;
+                            pix[n] = new Color(val, val, val, 1f);
+                        }
+
+                        _noiseTex.SetPixels(pix);
+                        _noiseTex.Apply();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[DitherFx] Failed to create noise texture (WebGL safe fallback): {e.Message}");
+                    _noiseTex = null;
                 }
             }
         }
