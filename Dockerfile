@@ -1,4 +1,4 @@
-FROM unityci/editor:ubuntu-6000.0.79f1-webgl-3.2.2 as builder
+FROM unityci/editor:ubuntu-6000.2.2f1-webgl-3.1.0 as builder
 
 WORKDIR /project
 
@@ -7,7 +7,6 @@ COPY . .
 RUN /opt/unity/Editor/Unity \
     -batchmode \
     -nographics \
-    -nolicense \
     -quit \
     -projectPath /project \
     -buildTarget WebGL \
