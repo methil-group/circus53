@@ -9,6 +9,7 @@ namespace Core.Player
     public class PlayerFPS : Updatable<PlayerController>
     {
         [Header("Look Settings")]
+        [SerializeField] private bool canLook = true;
         [SerializeField] private float mouseSensitivity = 0.1f;
         [SerializeField] private float minPitch = -89f;
         [SerializeField] private float maxPitch = 89f;
@@ -30,15 +31,17 @@ namespace Core.Player
                 lookAction.action.Enable();
             }
 
-            if (lockCursor)
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-            }
+            UpdateCursorState();
         }
 
         public override void Update(PlayerController controller)
         {
+            // Keep cursor state in sync (allows runtime toggling in the editor)
+            UpdateCursorState();
+
+            // Skip camera rotation if look is disabled
+            if (!canLook) return;
+
             Vector2 lookInput = Vector2.zero;
 
             // 1. Try to read from assigned InputActionReference
@@ -77,6 +80,20 @@ namespace Core.Player
 
             // Rotate player body horizontally (Yaw)
             controller.transform.Rotate(Vector3.up * mouseX);
+        }
+
+        private void UpdateCursorState()
+        {
+            if (canLook && lockCursor)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
     }
 }

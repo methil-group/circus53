@@ -10,6 +10,7 @@ namespace Core.Player
     public class PlayerMovement : Updatable<PlayerController>
     {
         [Header("Movement Settings")]
+        [SerializeField] private bool canMove = true;
         [SerializeField] private float speed = 5f;
         [SerializeField] private float gravity = -9.81f;
         [SerializeField] private float jumpHeight = 1.2f;
@@ -49,6 +50,17 @@ namespace Core.Player
             if (_isGrounded && _velocity.y < 0)
             {
                 _velocity.y = -2f;
+            }
+
+            // Skip input processing if movement is disabled (gravity still applies)
+            if (!canMove)
+            {
+                _currentMoveVelocity = Vector3.Lerp(_currentMoveVelocity, Vector3.zero, movementSmoothTime * Time.deltaTime);
+                charController.Move(_currentMoveVelocity * Time.deltaTime);
+
+                _velocity.y += gravity * Time.deltaTime;
+                charController.Move(_velocity * Time.deltaTime);
+                return;
             }
 
             // Input System reading
