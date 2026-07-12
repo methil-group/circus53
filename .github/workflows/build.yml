@@ -1,0 +1,49 @@
+name: Build (Windows + Linux)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build ${{ matrix.targetPlatform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneWindows64
+          - StandaloneLinux64
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupère le code source
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Cache de la bibliothèque Unity pour accélérer les builds
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ matrix.targetPlatform }}-
+            Library-
+
+      # Build Unity via game-ci/unity-builder
+      - name: Build Unity project
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: 6000.5.2f1
+          targetPlatform: ${{ matrix.targetPlatform }}
+
+      # Upload l'artefact de build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dc_jam_${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}
+          retention-days: 30

@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eca2e8d1c8fb13a4abc7116bfb2ef274, type: 3}
-  m_Name: DitherFx
-  m_EditorClassIdentifier: Masking.Runtime::VolFx.DitherFx
+  m_Name: MethilDither
+  m_EditorClassIdentifier: Masking.Runtime::VolFx.MethilDither
   m_Active: 1
   _event: 600
   _pass: {fileID: -3374652372993124946}
@@ -27,7 +27,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 704e9f69207ce0e44a2be12086db83b0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Masking.Runtime::VolFx.DitherPass
+  m_EditorClassIdentifier: Masking.Runtime::VolFx.MethilDitherPass
   _active: 1
   _shader: {fileID: 4800000, guid: 0e83aac3b775ca94b92d8aaafbad155e, type: 3}
   _noiseScale: 1
