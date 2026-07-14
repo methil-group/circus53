@@ -12,9 +12,23 @@ namespace Core.Player
         [Header("Movement Settings")]
         [SerializeField] private bool canMove = true;
         [SerializeField] private float speed = 5f;
+
+        /// <summary>Vitesse de déplacement du joueur (modifiable au runtime).</summary>
+        public float Speed { get => speed; set => speed = value; }
+
+        /// <summary>Active ou désactive le mouvement du joueur.</summary>
+        public void SetActive(bool active) => canMove = active;
         [SerializeField] private float gravity = -9.81f;
         [SerializeField] private float jumpHeight = 1.2f;
         [SerializeField] private float movementSmoothTime = 4f; // Controls the slide/inertia speed
+
+        [Header("Camera Bob")]
+        [SerializeField] private Transform _bobTransform;
+        [SerializeField] private float _bobAmount = 0.05f;
+        [SerializeField] private float _bobFrequency = 2.5f;
+        [SerializeField] private float _bobHorizontal = 0.03f;
+        [SerializeField] private AnimationCurve _bobCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+        [SerializeField] private float _bobSmoothSpeed = 8f;
 
         [Header("Inputs Reference")]
         [SerializeField] private InputActionReference moveAction;
@@ -27,6 +41,19 @@ namespace Core.Player
         private Vector3 _velocity;
         private Vector3 _currentMoveVelocity;
         private bool _isGrounded;
+
+        // Bob state
+        private float   _bobPhase;
+        private Vector3 _currentBobOffset;
+        private Vector3 _defaultCameraPosition;
+        private bool    _hasDefaultCameraPos;
+
+        /// <summary>Vélocité horizontale lissée (utilisée par le headbob, effets caméra, etc.).</summary>
+        public Vector3 CurrentMoveVelocity => _currentMoveVelocity;
+        /// <summary>True si le joueur est en train de se déplacer horizontalement.</summary>
+        public bool IsMoving => _currentMoveVelocity.sqrMagnitude > 0.0001f;
+        /// <summary>True si le joueur touche le sol.</summary>
+        public bool IsGrounded => _isGrounded;
 
         public override void Start(PlayerController controller)
         {
@@ -143,6 +170,47 @@ namespace Core.Player
             // Gravity
             _velocity.y += gravity * Time.deltaTime;
             charController.Move(_velocity * Time.deltaTime);
+
+            // ---- Camera Bob ----
+            ApplyCameraBob(controller);
+        }
+
+        // =======================================================================
+        // Camera Bob
+
+        private void ApplyCameraBob(PlayerController controller)
+        {
+            // Priorité au bobTransform (parent de la caméra), fallback sur la caméra elle-même
+            Transform target = _bobTransform != null ? _bobTransform : controller.CameraTransform;
+            if (target == null) return;
+
+            // Sauvegarde la position par défaut au premier frame
+            if (!_hasDefaultCameraPos)
+            {
+                _defaultCameraPosition = target.localPosition;
+                _hasDefaultCameraPos = true;
+            }
+
+            // Calcule l'offset bob cible (zéro si immobile ou en l'air)
+            Vector3 targetBob = Vector3.zero;
+
+            if (IsMoving && _isGrounded)
+            {
+                _bobPhase += _currentMoveVelocity.magnitude * _bobFrequency * Time.deltaTime;
+                float phase = _bobPhase % (Mathf.PI * 2f);
+                float vertical   = Mathf.Sin(phase) * _bobAmount;
+                float horizontal = Mathf.Cos(phase * 0.5f) * _bobHorizontal;
+
+                float curveValue = _bobCurve != null ? _bobCurve.Evaluate((Mathf.Sin(phase) + 1f) / 2f) : 1f;
+                vertical *= curveValue;
+
+                targetBob = new Vector3(horizontal, vertical, 0f);
+            }
+
+            // Lisse l'offset : transition douce vers zéro quand on s'arrête
+            _currentBobOffset = Vector3.Lerp(_currentBobOffset, targetBob, _bobSmoothSpeed * Time.deltaTime);
+
+            target.localPosition = _defaultCameraPosition + _currentBobOffset;
         }
     }
 }

@@ -23,9 +23,12 @@ namespace Core
         [SerializeField, Tooltip("Caméra à regarder. Null = Camera.main (auto-détectée).")]
         private Camera _targetCamera;
         
-        [Header("Comportement")]
-        [SerializeField, Tooltip("Inverse le sens : l'objet tourne le dos à la caméra au lieu de lui faire face.")]
-        private bool _flipDirection;
+    [Header("Comportement")]
+    [SerializeField, Tooltip("Inverse le sens : l'objet tourne le dos à la caméra au lieu de lui faire face.")]
+    private bool _flipDirection;
+    
+    [SerializeField, Tooltip("Rotation supplémentaire en degrés sur les 3 axes (appliquée après le look-at).")]
+    private Vector3 _rotationOffset = Vector3.zero;
         
         [SerializeField, Tooltip("Si coché, le billboard est mis à jour uniquement via l'appel manuel Refresh().\n" +
                                  "Utile pour les objets statiques qui ne changent jamais de position.")]
@@ -92,7 +95,7 @@ namespace Core
                 Vector3.up
             );
             
-            _cachedTransform.rotation = targetRotation;
+            _cachedTransform.rotation = targetRotation * Quaternion.Euler(_rotationOffset);
         }
         
         // =======================================================================
@@ -122,10 +125,13 @@ namespace Core
             Camera cam = _targetCamera != null ? _targetCamera : Camera.main;
             if (cam == null) return;
             
-            // Visualisation de la direction de face
+            // Visualisation de la direction de face (avec offset)
             Vector3 flat = (cam.transform.position - _cachedTransform.position).normalized;
             flat.y = 0f;
             flat = flat.normalized;
+            
+            if (_flipDirection) flat = -flat;
+            flat = Quaternion.Euler(_rotationOffset) * flat;
             
             Gizmos.color = Color.cyan;
             Gizmos.DrawRay(_cachedTransform.position, flat * 1.5f);

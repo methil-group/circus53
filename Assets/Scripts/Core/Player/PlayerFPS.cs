@@ -13,7 +13,7 @@ namespace Core.Player
         [SerializeField] private float mouseSensitivity = 0.1f;
         [SerializeField] private float minPitch = -89f;
         [SerializeField] private float maxPitch = 89f;
-        [SerializeField] private float lookSmoothSpeed = 10f; // Speed of look smoothing (lower is slower/floatier)
+        [SerializeField] private float lookSmoothSpeed = 10f;
 
         [Header("Inputs Reference")]
         [SerializeField] private InputActionReference lookAction;
@@ -23,6 +23,29 @@ namespace Core.Player
 
         private float _rotationX = 0f;
         private Vector2 _smoothLookInput;
+        private bool _skipFrame; // évite un saut à la réactivation du look
+
+        /// <summary>Active ou désactive le contrôle de la caméra (look).</summary>
+        public void SetActive(bool active, Transform cameraTransform = null)
+        {
+            if (canLook == active) return; // évite double appel inutile
+            
+            canLook = active;
+            _smoothLookInput = Vector2.zero;
+            
+            if (active && cameraTransform != null)
+            {
+                // Resynchronise _rotationX sur l'angle réel de la caméra
+                float pitch = cameraTransform.localRotation.eulerAngles.x;
+                if (pitch > 180f) pitch -= 360f;
+                _rotationX = Mathf.Clamp(pitch, minPitch, maxPitch);
+                _skipFrame = true; // saute le premier frame pour éviter conflit Cinemachine
+            }
+            
+            UpdateCursorState();
+        }
+
+        // =======================================================================
 
         public override void Start(PlayerController controller)
         {
@@ -36,20 +59,23 @@ namespace Core.Player
 
         public override void Update(PlayerController controller)
         {
-            // Keep cursor state in sync (allows runtime toggling in the editor)
+            // Skip si on vient de réactiver (évite conflit avec Cinemachine/LookAt)
+            if (_skipFrame)
+            {
+                _skipFrame = false;
+                return;
+            }
+            
             UpdateCursorState();
 
-            // Skip camera rotation if look is disabled
-            if (!canLook) return;
+            if (!canLook || Cursor.lockState != CursorLockMode.Locked) return;
 
             Vector2 lookInput = Vector2.zero;
 
-            // 1. Try to read from assigned InputActionReference
             if (lookAction != null && lookAction.action != null)
             {
                 lookInput = lookAction.action.ReadValue<Vector2>();
             }
-            // 2. Fallback to direct mouse/gamepad delta
             else
             {
                 if (Mouse.current != null)
@@ -58,18 +84,15 @@ namespace Core.Player
                 }
                 if (Gamepad.current != null)
                 {
-                    lookInput += Gamepad.current.rightStick.ReadValue() * 10f; // Scale gamepad stick speed
+                    lookInput += Gamepad.current.rightStick.ReadValue() * 10f;
                 }
             }
 
-            // Lerp look input for smooth/dreamy camera lag
             _smoothLookInput = Vector2.Lerp(_smoothLookInput, lookInput, lookSmoothSpeed * Time.deltaTime);
 
-            // Scale by sensitivity
             float mouseX = _smoothLookInput.x * mouseSensitivity;
             float mouseY = _smoothLookInput.y * mouseSensitivity;
 
-            // Rotate camera vertically (Pitch)
             _rotationX -= mouseY;
             _rotationX = Mathf.Clamp(_rotationX, minPitch, maxPitch);
 
@@ -78,13 +101,14 @@ namespace Core.Player
                 controller.CameraTransform.localRotation = Quaternion.Euler(_rotationX, 0f, 0f);
             }
 
-            // Rotate player body horizontally (Yaw)
             controller.transform.Rotate(Vector3.up * mouseX);
         }
 
+        // =======================================================================
+
         private void UpdateCursorState()
         {
-            if (canLook && lockCursor)
+            if (lockCursor)
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;

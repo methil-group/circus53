@@ -106,7 +106,11 @@ namespace VolFx
                 var source = resourceData.activeColorTexture;
                 if (!source.IsValid()) return;
 
-                var desc = renderGraph.GetTextureDesc(source);
+                // La back buffer (scène sans caméra, rendu par défaut) n'a pas de
+                // descriptor valide dans le RenderGraph → on ignore l'effet.
+                TextureDesc desc;
+                try { desc = renderGraph.GetTextureDesc(source); }
+                catch (System.ArgumentException) { return; }
                 desc.depthBufferBits = 0;
                 desc.name = _owner.name;
 

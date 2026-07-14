@@ -689,7 +689,7 @@ namespace Framework.UI.FX
             // Convert world corners to canvas-local
             Vector2 min = Vector2.positiveInfinity;
             Vector2 max = Vector2.negativeInfinity;
-            Camera cam = _canvas != null && _canvas.renderMode != RenderMode.ScreenSpaceOverlay ? _canvas.worldCamera : null;
+            UnityEngine.Camera cam = _canvas != null && _canvas.renderMode != RenderMode.ScreenSpaceOverlay ? _canvas.worldCamera : null;
 
             for (int i = 0; i < 4; i++)
             {
