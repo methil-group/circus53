@@ -1,14 +1,25 @@
-### 1. Créer `PlayerSounds` (ScriptableObject singleton)
+## Architecture du light show
 
-**Fichier** : `Assets/Scripts/Core/Player/PlayerSounds.cs`
+### 1. Enum `LightShowMode`
+- `Sequential` — s'allument une par une
+- `Flicker` — clignotent toutes en même temps
+- `Looping` — séquence → flicker → séquence → flicker...
 
-- Hérite de `SingletonScriptableObject<PlayerSounds>` → chargé auto depuis `Resources/`
-- Contient `[field: SerializeField] public AudioClip CallMomSound { get; private set; }`
-- Extensible : on pourra y ajouter d'autres sons plus tard
+### 2. `BulbState` (interne)
+Chaque ampoule track dans une petite struct : son `GameObject`, son `Renderer`, son `Material` dupliqué, sa `Light`
 
-**Asset** : `Assets/Resources/ScriptableObjects/PlayerSounds.asset` → à créer une fois le script compilé (clic droit → Create → Player Sounds)
+### 3. `SetupBulbs()` → crée les états + démarre la coroutine
+- Duplique le matériau
+- Crée la Point Light enfant
+- Stocke tout dans une `List<BulbState>`
+- Lance `_LightShowRoutine()` selon le mode
 
-### 2. Mettre à jour `PlayerInteraction`
+### 4. Coroutines
+- **Sequential** : pour chaque bulb → active emission + light → attend `_lightDelay` → suivant
+- **Flicker** : boucle infinie → active/désactive toutes les lumières aléatoirement
+- **Looping** : Sequential puis Flicker puis Sequential puis Flicker... en boucle
 
-- Garde la référence `_callMomAudioSource` (AudioSource)
-- Récupère le clip via `PlayerSounds.Instance.CallMomSound` au lieu de `_audioSource.clip`
+### Nouveaux champs
+- `LightShowMode mode` — choix du mode
+- `float _lightDelay = 0.5f` — délai entre chaque lampe
+- `float _flickerMinInterval / _flickerMaxInterval` — rythme du clignotement

@@ -53,6 +53,20 @@ namespace Framework.Camera
         [SerializeField, Tooltip("Courbe d'easing du LookAt smooth. X = progression 0→1, Y = valeur 0→1.\n" +
                                  "Par défaut : ease-out cubique (démarrage rapide, arrivée très douce).")]
         private AnimationCurve _smoothCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+        [Header("Human Look At")]
+        [SerializeField, Tooltip("Durée par défaut du regard humain (secondes).")]
+        private float _humanLookDuration = 1.5f;
+        
+        [SerializeField, Tooltip("Dépassement de la cible avant correction (0.05 = 5% au-delà).")]
+        [Range(0f, 0.15f)]
+        private float _humanLookOvershoot = 0.05f;
+        
+        [SerializeField, Tooltip("Délai de réaction minimum avant de commencer à tourner.")]
+        private float _humanLookMinDelay = 0.1f;
+        
+        [SerializeField, Tooltip("Délai de réaction maximum avant de commencer à tourner.")]
+        private float _humanLookMaxDelay = 0.2f;
         
         // =======================================================================
         
@@ -264,6 +278,88 @@ namespace Framework.Camera
         /// </summary>
         /// <param name="worldPosition">La position à regarder.</param>
         public void LookAtSmooth3Seconds(Vector3 worldPosition) => LookAtSmooth(worldPosition, 3f);
+
+        // =======================================================================
+        // Human Look At
+        // =======================================================================
+
+        /// <summary>
+        /// Regard "humain" : délai aléatoire, saccade rapide avec léger overshoot, puis correction douce.
+        /// </summary>
+        public void LookAtHuman(GameObject target)
+            => LookAtHuman(target, _humanLookDuration);
+
+        /// <summary>
+        /// Regard "humain" vers un GameObject avec durée personnalisée.
+        /// </summary>
+        public void LookAtHuman(GameObject target, float duration)
+        {
+            if (target == null || _gameCamera == null) return;
+            StartCoroutine(_humanLookAtRoutine(target.transform.position, duration));
+        }
+
+        /// <summary>
+        /// Regard "humain" vers une position monde (durée par défaut).
+        /// </summary>
+        public void LookAtHuman(Vector3 worldPosition)
+            => LookAtHuman(worldPosition, _humanLookDuration);
+
+        /// <summary>
+        /// Regard "humain" vers une position monde avec durée personnalisée.
+        /// </summary>
+        public void LookAtHuman(Vector3 worldPosition, float duration)
+        {
+            if (_gameCamera == null) return;
+            StartCoroutine(_humanLookAtRoutine(worldPosition, duration));
+        }
+
+        private IEnumerator _humanLookAtRoutine(Vector3 worldPosition, float duration)
+        {
+            // Délai de réaction aléatoire
+            float delay = Random.Range(_humanLookMinDelay, _humanLookMaxDelay);
+            yield return new WaitForSeconds(delay);
+
+            Quaternion from = _gameCamera.transform.rotation;
+            Vector3 dir = (worldPosition - _gameCamera.transform.position).normalized;
+            Quaternion to = Quaternion.LookRotation(dir);
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                float humanT = HumanCurve(t);
+                _gameCamera.transform.rotation = Quaternion.Slerp(from, to, humanT);
+                yield return null;
+            }
+
+            _gameCamera.transform.rotation = to;
+        }
+
+        /// <summary>
+        /// Courbe de mouvement humain : saccade rapide (0→70%) avec overshoot,
+        /// puis correction douce (70%→100%) vers la cible exacte.
+        /// </summary>
+        private float HumanCurve(float t)
+        {
+            const float split = 0.7f;
+
+            if (t < split)
+            {
+                // Phase 1 : saccade vers 1 + overshoot
+                float phaseT = t / split;
+                return (1f + _humanLookOvershoot) * SmoothStep(phaseT);
+            }
+            else
+            {
+                // Phase 2 : correction de l'overshoot vers 1.0
+                float phaseT = (t - split) / (1f - split);
+                float start = 1f + _humanLookOvershoot;
+                return Mathf.Lerp(start, 1f, SmoothStep(phaseT));
+            }
+        }
+
+        private static float SmoothStep(float t) => t * t * (3f - 2f * t);
 
         // =======================================================================
         

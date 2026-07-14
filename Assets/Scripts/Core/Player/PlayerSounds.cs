@@ -12,5 +12,10 @@ namespace Core.Player
     {
         [Header("Call Mom")]
         [field: SerializeField] public AudioClip CallMomSound { get; private set; }
+
+        [Header("Footsteps")]
+        [field: SerializeField] public AudioClip WalkOnGrass    { get; private set; }
+        [field: SerializeField] public AudioClip WalkOnDryGrass { get; private set; }
+        [field: SerializeField] public AudioClip WalkOnWetGrass { get; private set; }
     }
 }

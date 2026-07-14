@@ -180,14 +180,20 @@ namespace Core.Player
 
         private void ApplyCameraBob(PlayerController controller)
         {
-            // Priorité au bobTransform (parent de la caméra), fallback sur la caméra elle-même
-            Transform target = _bobTransform != null ? _bobTransform : controller.CameraTransform;
-            if (target == null) return;
+            if (controller.CameraTransform == null) return;
+
+            // Le bob s'applique sur le parent de la caméra (pour le décorréler du look FPS)
+            Transform bobTarget = _bobTransform != null ? _bobTransform : controller.CameraTransform.parent;
+            if (bobTarget == null)
+            {
+                // Pas de parent : on bob la caméra directement (fallback)
+                bobTarget = controller.CameraTransform;
+            }
 
             // Sauvegarde la position par défaut au premier frame
             if (!_hasDefaultCameraPos)
             {
-                _defaultCameraPosition = target.localPosition;
+                _defaultCameraPosition = bobTarget.localPosition;
                 _hasDefaultCameraPos = true;
             }
 
@@ -204,13 +210,13 @@ namespace Core.Player
                 float curveValue = _bobCurve != null ? _bobCurve.Evaluate((Mathf.Sin(phase) + 1f) / 2f) : 1f;
                 vertical *= curveValue;
 
-                targetBob = new Vector3(horizontal, vertical, 0f);
+                targetBob = new Vector3(0f, vertical, 0f);
             }
 
             // Lisse l'offset : transition douce vers zéro quand on s'arrête
             _currentBobOffset = Vector3.Lerp(_currentBobOffset, targetBob, _bobSmoothSpeed * Time.deltaTime);
 
-            target.localPosition = _defaultCameraPosition + _currentBobOffset;
+            bobTarget.localPosition = _defaultCameraPosition + _currentBobOffset;
         }
     }
 }

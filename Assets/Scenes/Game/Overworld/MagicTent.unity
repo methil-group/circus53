@@ -6142,6 +6142,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9125666452494350179, guid: cd21c924206efda44a71a507f59a2e41, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1770468283}
+    - target: {fileID: 9125666452494350179, guid: cd21c924206efda44a71a507f59a2e41, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LookAtSmooth3Seconds
+      objectReference: {fileID: 0}
+    - target: {fileID: 9125666452494350179, guid: cd21c924206efda44a71a507f59a2e41, type: 3}
       propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 957099406}
@@ -7022,6 +7030,17 @@ PlayableDirector:
     - a949cd251a602944386becc638c42218: {fileID: 923850701}
     - f977d1409877acf4389f931c5b269ed8: {fileID: 923850701}
     - bfe675a8885dc694987c9dd5b4007ef4: {fileID: 923850701}
+--- !u!114 &1770468283 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9131611732174148786, guid: cd21c924206efda44a71a507f59a2e41, type: 3}
+  m_PrefabInstance: {fileID: 675895318}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef80ac3390d804044a83c96af2ab0934, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.Camera.MethilCamera
 --- !u!1 &1771883022
 GameObject:
   m_ObjectHideFlags: 0
