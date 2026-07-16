@@ -117,16 +117,19 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 1951499173295554807
-      type: {class: PlayerMovement, ns: Core.Player, asm: Assembly-CSharp}
+      type: {class: PlayerPointAndClick, ns: Core.Player, asm: Assembly-CSharp}
       data:
         canMove: 1
-        speed: 5
-        gravity: -9.81
-        jumpHeight: 1.2
-        movementSmoothTime: 4
-        _bobAmount: 0.05
-        _bobFrequency: 2.5
-        _bobHorizontal: 0.03
+        speed: 4
+        arrivalThreshold: 1.5
+        lookBeforeWalk: 1
+        lookDuration: 0.4
+        rotationSpeed: 360
+        lookAtDuration: 0.8
+        enableHeadBob: 1
+        _bobTransform: {fileID: 7643279266751635552}
+        _bobAmount: 0.03
+        _bobFrequency: 3
         _bobCurve:
           serializedVersion: 2
           m_Curve:
@@ -152,12 +155,17 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
         _bobSmoothSpeed: 8
-        moveAction: {fileID: -4582755474758846682, guid: ce44eb113cc3dc54483b2515760013e1, type: 3}
-        jumpAction: {fileID: -3364406504291799686, guid: ce44eb113cc3dc54483b2515760013e1, type: 3}
+        stuckTimeout: 1.5
+        stuckDistanceDelta: 0.05
+        pointAction: {fileID: 0}
+        clickAction: {fileID: 0}
+        defaultCursor: {fileID: 0}
+        defaultCursorHotspot: {x: 0, y: 0}
     - rid: 1951499173295554808
       type: {class: PlayerFPS, ns: Core.Player, asm: Assembly-CSharp}
       data:
         canLook: 1
+        _lookEnabled: 0
         mouseSensitivity: 0.1
         minPitch: -89
         maxPitch: 89

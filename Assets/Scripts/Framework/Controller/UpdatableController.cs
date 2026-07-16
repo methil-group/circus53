@@ -55,5 +55,23 @@ namespace Framework.Controller
                 if (updatable != null) updatable.OnDestroy((T)(object)this);
             }
         }
+
+        // =======================================================================
+
+        protected virtual void OnEnable()
+        {
+            foreach (var updatable in updatables)
+            {
+                if (updatable != null) updatable.OnEnabled((T)(object)this);
+            }
+        }
+
+        protected virtual void OnDisable()
+        {
+            foreach (var updatable in updatables)
+            {
+                if (updatable != null) updatable.OnDisabled((T)(object)this);
+            }
+        }
     }
 }

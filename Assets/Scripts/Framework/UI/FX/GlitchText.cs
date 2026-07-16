@@ -120,6 +120,12 @@ namespace Framework.UI.FX
         [SerializeField, Range(0.05f, 3f)] float artefactMaxDuration = 1.2f;
         [SerializeField, Range(0f, 1f)] float artefactSpawnChance = 0.5f;
 
+        /// <summary>
+        /// Intensité globale du glitch (0 = pas d'effet, 1 = effet maximum).
+        /// Modifiable au runtime par des systèmes externes (ex: SanityUI).
+        /// </summary>
+        public float Intensity { get; set; } = 1f;
+
         // ═══════════════════════════════════════
         // Internal state
         // ═══════════════════════════════════════
@@ -211,7 +217,7 @@ namespace Framework.UI.FX
 
             float dt = Time.deltaTime;
 
-            if (enableWave && !_isWaving && _chars.Count > 0 && Random.value < waveChancePerSecond * dt)
+            if (enableWave && !_isWaving && _chars.Count > 0 && Random.value < waveChancePerSecond * Intensity * dt)
                 StartCoroutine(WaveRoutine());
 
             ProcessAllCharacters(dt);
@@ -317,12 +323,13 @@ namespace Framework.UI.FX
 
             if (enableMicroJitter)
             {
-                jx = (Mathf.PerlinNoise(Time.time * microJitterSpeed + cd.seedA * 100f, charIndex * 0.7f) - 0.5f) * 2f * microJitter;
-                jy = (Mathf.PerlinNoise(Time.time * microJitterSpeed * 1.3f + cd.seedB * 100f, charIndex * 0.7f + 50f) - 0.5f) * 2f * microJitter;
+                float jit = microJitter * Intensity;
+                jx = (Mathf.PerlinNoise(Time.time * microJitterSpeed + cd.seedA * 100f, charIndex * 0.7f) - 0.5f) * 2f * jit;
+                jy = (Mathf.PerlinNoise(Time.time * microJitterSpeed * 1.3f + cd.seedB * 100f, charIndex * 0.7f + 50f) - 0.5f) * 2f * jit;
             }
 
             if (enableVerticalCreep)
-                creep = Mathf.Sin(Time.time * verticalCreepSpeed + cd.seedA * 10f) * verticalCreep;
+                creep = Mathf.Sin(Time.time * verticalCreepSpeed + cd.seedA * 10f) * verticalCreep * Intensity;
 
             cd.offset = new Vector3(jx, jy + creep, 0f);
             cd.colorShift = cd.restColor;
@@ -353,9 +360,9 @@ namespace Framework.UI.FX
             bool foundState = false;
 
             // Decide the state once for the whole group
-            float twitchW = enableTwitch ? twitchChancePerSecond : 0f;
-            float driftW = enableDrift ? driftChancePerSecond : 0f;
-            float corruptW = enableCorrupt ? corruptChancePerSecond : 0f;
+            float twitchW = enableTwitch ? twitchChancePerSecond * Intensity : 0f;
+            float driftW = enableDrift ? driftChancePerSecond * Intensity : 0f;
+            float corruptW = enableCorrupt ? corruptChancePerSecond * Intensity : 0f;
             float totalW = twitchW + driftW + corruptW;
 
             if (totalW > 0f)
@@ -396,13 +403,13 @@ namespace Framework.UI.FX
                 }
 
                 cd.offset = chosenState == GlitchState.Corrupt
-                    ? RandomInsideCircle(corruptDisplacement)
+                    ? RandomInsideCircle(corruptDisplacement * Intensity)
                     : chosenState == GlitchState.Drift
                         ? Vector3.zero
-                        : RandomInsideCircle(twitchDisplacement);
+                        : RandomInsideCircle(twitchDisplacement * Intensity);
 
                 cd.driftTarget = chosenState == GlitchState.Drift
-                    ? RandomInsideCircle(driftDistance)
+                    ? RandomInsideCircle(driftDistance * Intensity)
                     : Vector3.zero;
 
                 _chars[i] = cd;
@@ -417,9 +424,9 @@ namespace Framework.UI.FX
         {
             if (_isWaving) return;
 
-            float twitchW = enableTwitch ? twitchChancePerSecond : 0f;
-            float driftW = enableDrift ? driftChancePerSecond : 0f;
-            float corruptW = enableCorrupt ? corruptChancePerSecond : 0f;
+            float twitchW = enableTwitch ? twitchChancePerSecond * Intensity : 0f;
+            float driftW = enableDrift ? driftChancePerSecond * Intensity : 0f;
+            float corruptW = enableCorrupt ? corruptChancePerSecond * Intensity : 0f;
             float totalW = twitchW + driftW + corruptW;
 
             if (totalW <= 0f)
@@ -436,14 +443,14 @@ namespace Framework.UI.FX
                 cd.state = GlitchState.Corrupt;
                 cd.stateDuration = RandomRange(0.06f, 0.25f);
                 cd.stateTimer = cd.stateDuration;
-                cd.offset = RandomInsideCircle(corruptDisplacement);
+                cd.offset = RandomInsideCircle(corruptDisplacement * Intensity);
             }
             else if (roll < corruptW + driftW)
             {
                 cd.state = GlitchState.Drift;
                 cd.stateDuration = driftDuration * RandomRange(0.5f, 1.5f);
                 cd.stateTimer = cd.stateDuration;
-                cd.driftTarget = RandomInsideCircle(driftDistance);
+                cd.driftTarget = RandomInsideCircle(driftDistance * Intensity);
                 cd.offset = Vector3.zero;
             }
             else
@@ -451,7 +458,7 @@ namespace Framework.UI.FX
                 cd.state = GlitchState.Twitch;
                 cd.stateDuration = RandomRange(0.03f, 0.12f);
                 cd.stateTimer = cd.stateDuration;
-                cd.offset = RandomInsideCircle(twitchDisplacement);
+                cd.offset = RandomInsideCircle(twitchDisplacement * Intensity);
             }
         }
 
@@ -471,8 +478,8 @@ namespace Framework.UI.FX
             else
             {
                 float fade = cd.stateTimer / cd.stateDuration;
-                cd.offset *= fade;
-                cd.colorShift = PickGlitchColor(cd.restColor, colorScrambleAmount * fade);
+                cd.offset *= fade * Intensity;
+                cd.colorShift = PickGlitchColor(cd.restColor, colorScrambleAmount * Intensity * fade);
             }
         }
 
@@ -520,8 +527,8 @@ namespace Framework.UI.FX
             else
             {
                 float intensity = cd.stateTimer / cd.stateDuration;
-                cd.offset = RandomInsideCircle(corruptDisplacement * intensity);
-                cd.colorShift = PickGlitchColor(cd.restColor, corruptColorSplit * intensity);
+                cd.offset = RandomInsideCircle(corruptDisplacement * intensity * Intensity);
+                cd.colorShift = PickGlitchColor(cd.restColor, corruptColorSplit * intensity * Intensity);
 
                 if ((float)_rng.NextDouble() < 0.3f)
                     cd.offset.y *= 1.5f;
@@ -548,11 +555,12 @@ namespace Framework.UI.FX
             else
             {
                 float fade = cd.stateTimer / cd.stateDuration;
+                float wd = waveDisplacement * Intensity;
                 cd.offset = new Vector3(
-                    (Mathf.PerlinNoise(Time.time * 30f, cd.seedA) - 0.5f) * waveDisplacement * fade,
-                    (Mathf.PerlinNoise(Time.time * 25f, cd.seedB) - 0.5f) * waveDisplacement * 0.5f * fade,
+                    (Mathf.PerlinNoise(Time.time * 30f, cd.seedA) - 0.5f) * wd * fade,
+                    (Mathf.PerlinNoise(Time.time * 25f, cd.seedB) - 0.5f) * wd * 0.5f * fade,
                     0f);
-                cd.colorShift = PickGlitchColor(cd.restColor, 0.6f * fade);
+                cd.colorShift = PickGlitchColor(cd.restColor, 0.6f * fade * Intensity);
 
                 // Spawn artefacts during wave
                 if (enableArtefacts && (float)_rng.NextDouble() < artefactSpawnChance * fade)

@@ -10,6 +10,9 @@ namespace Core.Player
     {
         [Header("Look Settings")]
         [SerializeField] private bool canLook = true;
+        [SerializeField, Tooltip("Si désactivé, le look FPS est complètement désactivé et le curseur est libre.\n" +
+                                 "Utilisé pour le mode point & click.")]
+        private bool _lookEnabled = true;
         [SerializeField] private float mouseSensitivity = 0.1f;
         [SerializeField] private float minPitch = -89f;
         [SerializeField] private float maxPitch = 89f;
@@ -59,6 +62,14 @@ namespace Core.Player
 
         public override void Update(PlayerController controller)
         {
+            // Si le look est désactivé globalement, curseur libre, pas de look
+            if (!_lookEnabled)
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+                return;
+            }
+            
             // Skip si on vient de réactiver (évite conflit avec Cinemachine/LookAt)
             if (_skipFrame)
             {

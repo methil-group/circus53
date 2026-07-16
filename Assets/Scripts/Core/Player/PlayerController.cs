@@ -19,8 +19,12 @@ namespace Core.Player
         /// <summary>Active ou désactive le déplacement du joueur.</summary>
         public void ActivateMove(bool active)
         {
+            // Compatible avec l'ancien PlayerMovement et le nouveau PlayerPointAndClick
             var movement = updatables.OfType<PlayerMovement>().FirstOrDefault();
             movement?.SetActive(active);
+
+            var pointAndClick = updatables.OfType<PlayerPointAndClick>().FirstOrDefault();
+            pointAndClick?.SetActive(active);
         }
         
         /// <summary>Active ou désactive le contrôle de la caméra (look).</summary>
