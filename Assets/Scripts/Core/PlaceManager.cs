@@ -47,28 +47,28 @@ namespace Core
         [SerializeField] private bool _enableHeadBob = true;
         [SerializeField, Tooltip("Transform qui reçoit le bob (ex: CameraHolder). Si null, cherche automatiquement le parent de la Main Camera.")]
         private Transform _headBobTarget;
-        [SerializeField, Tooltip("Amplitude du balancement horizontal (cos). Ajoute un mouvement de gauche à droite.")]
-        private float _bobAmountX = 0.04f;
-        [SerializeField, Tooltip("Amplitude du rebond vertical (sin). Ajoute un mouvement de haut en bas.")]
-        private float _bobAmountY = 0.08f;
+        [SerializeField, Tooltip("Amplitude du balancement horizontal (cos). Balancement gauche/droite en courant.")]
+        private float _bobAmountX = 0.06f;
+        [SerializeField, Tooltip("Amplitude du rebond vertical (sin). Rebond haut/bas en courant.")]
+        private float _bobAmountY = 0.12f;
         [SerializeField, Tooltip("Vitesse d'oscillation horizontale. Plus la valeur est haute, plus le balancement latéral est rapide.")]
         private float _bobFrequencyX = 8.5f;
         [SerializeField, Tooltip("Vitesse d'oscillation verticale. Plus la valeur est haute, plus le rebond est rapide.")]
         private float _bobFrequencyY = 5f;
-        [SerializeField, Tooltip("Transition horizontale : temps de lerp vers la position cible. Valeur basse = plus sec, haute = plus fluide.")]
-        private float _bobSmoothX = 10f;
-        [SerializeField, Tooltip("Transition verticale : temps de lerp vers la position cible. Valeur basse = plus sec, haute = plus fluide.")]
-        private float _bobSmoothY = 10f;
-        [SerializeField, Tooltip("Amplitude de rotation en pitch (X). La tête hoche haut/bas en marchant.")]
-        private float _bobRotX = 1.5f;
-        [SerializeField, Tooltip("Amplitude de rotation en yaw (Y). La tête tourne légèrement gauche/droite.")]
-        private float _bobRotY = 1f;
+        [SerializeField, Tooltip("Transition horizontale : lerp vers la position cible. Plus c'est haut, plus c'est fluide.")]
+        private float _bobSmoothX = 15f;
+        [SerializeField, Tooltip("Transition verticale : lerp vers la position cible. Plus c'est haut, plus c'est fluide.")]
+        private float _bobSmoothY = 15f;
+        [SerializeField, Tooltip("Amplitude de rotation en pitch (X). La tête hoche haut/bas en courant.")]
+        private float _bobRotX = 4f;
+        [SerializeField, Tooltip("Amplitude de rotation en yaw (Y). La tête tourne gauche/droite en courant.")]
+        private float _bobRotY = 3f;
         [SerializeField, Tooltip("Amplitude de rotation en roll (Z). La tête penche gauche/droite.")]
-        private float _bobRotZ = 0.8f;
+        private float _bobRotZ = 2f;
         [SerializeField, Tooltip("Vitesse d'oscillation des rotations de tête.")]
-        private float _bobRotFrequency = 3f;
-        [SerializeField, Tooltip("Transition des rotations : lerp vers l'angle cible. Bas = saccadé, haut = fluide.")]
-        private float _bobRotSmooth = 8f;
+        private float _bobRotFrequency = 4f;
+        [SerializeField, Tooltip("Transition des rotations : lerp vers l'angle cible. Plus c'est haut, plus c'est fluide.")]
+        private float _bobRotSmooth = 15f;
 
         [Header("Events")]
         [SerializeField] private UnityEvent<Place> _onPlaceChanged;
