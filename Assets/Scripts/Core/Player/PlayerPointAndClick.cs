@@ -130,7 +130,15 @@ namespace Core.Player
             _navMeshAgent.updatePosition = true;
             _navMeshAgent.updateRotation = false;
             _navMeshAgent.updateUpAxis = true;
-            _navMeshAgent.isStopped = true;
+
+            if (_navMeshAgent.isOnNavMesh)
+            {
+                _navMeshAgent.isStopped = true;
+            }
+            else
+            {
+                Debug.LogWarning("[PointAndClick] NavMeshAgent pas sur un NavMesh au Start. Le joueur doit être placé sur une surface navigable.");
+            }
 
             if (_cameraTransform != null)
             {
@@ -321,8 +329,9 @@ namespace Core.Player
             string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
             Debug.Log($"[PointAndClick] Cible: '{targetName}' (targetPos: {_targetPosition})");
 
-            _navMeshAgent.isStopped = true;
-            _navMeshAgent.SetDestination(_targetPosition);
+            SafeSetStopped(true);
+            if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
+                _navMeshAgent.SetDestination(_targetPosition);
 
             if (lookBeforeWalk)
             {
@@ -332,7 +341,7 @@ namespace Core.Player
             }
             else
             {
-                _navMeshAgent.isStopped = false;
+                SafeSetStopped(false);
                 _state = State.Walking;
                 _isMoving = true;
                 Debug.Log($"[PointAndClick] Démarrage direct WALK");
@@ -364,7 +373,7 @@ namespace Core.Player
             // Après la durée de look, on commence à marcher
             if (_lookTimer >= lookDuration)
             {
-                _navMeshAgent.isStopped = false;
+                SafeSetStopped(false);
                 _state = State.Walking;
                 _isMoving = true;
                 string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
@@ -449,11 +458,15 @@ namespace Core.Player
             _isMoving = false;
             _currentTarget = null;
             _currentCameraPoint = null;
-            if (_navMeshAgent != null)
-            {
-                _navMeshAgent.isStopped = true;
+            SafeSetStopped(true);
+            if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
                 _navMeshAgent.ResetPath();
-            }
+        }
+
+        private void SafeSetStopped(bool stopped)
+        {
+            if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
+                _navMeshAgent.isStopped = stopped;
         }
 
         /// <summary>Arrivée même si le path est invalide (fallback sans rien appliquer).</summary>
@@ -467,8 +480,9 @@ namespace Core.Player
         {
             _state = State.Idle;
             _isMoving = false;
-            _navMeshAgent.isStopped = true;
-            _navMeshAgent.ResetPath();
+            SafeSetStopped(true);
+            if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
+                _navMeshAgent.ResetPath();
 
             if (_currentCameraPoint != null)
             {
