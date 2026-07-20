@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Core
@@ -278,32 +277,13 @@ namespace Core
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(action);
 
-            // Rendu invisible
+            // Désactiver l'Image du bouton
             Graphic graphic = button.targetGraphic;
             if (graphic != null)
-            {
-                Color c = graphic.color;
-                c.a = 0f;
-                graphic.color = c;
-            }
+                graphic.enabled = false;
 
             // Cacher tous les enfants par défaut
             SetFirstChildVisible(button, false);
-
-            // Hover : afficher le premier enfant si interactable
-            EventTrigger trigger = button.gameObject.GetComponent<EventTrigger>();
-            if (trigger == null)
-                trigger = button.gameObject.AddComponent<EventTrigger>();
-
-            trigger.triggers.Clear();
-
-            EventTrigger.Entry enter = new() { eventID = EventTriggerType.PointerEnter };
-            enter.callback.AddListener(_ => OnButtonHover(button, true));
-            trigger.triggers.Add(enter);
-
-            EventTrigger.Entry exit = new() { eventID = EventTriggerType.PointerExit };
-            exit.callback.AddListener(_ => OnButtonHover(button, false));
-            trigger.triggers.Add(exit);
         }
 
         private void RefreshButtons()
@@ -326,15 +306,12 @@ namespace Core
             if (button == null) return;
             button.interactable = interactable;
 
-            // Si désactivé, cacher l'enfant immédiatement
-            if (!interactable)
-                SetFirstChildVisible(button, false);
-        }
+            // Activer l'Image et le premier enfant seulement si interactable
+            Graphic graphic = button.targetGraphic;
+            if (graphic != null)
+                graphic.enabled = interactable;
 
-        private void OnButtonHover(Button button, bool hover)
-        {
-            if (button == null) return;
-            SetFirstChildVisible(button, hover && button.interactable);
+            SetFirstChildVisible(button, interactable);
         }
 
         private static void SetFirstChildVisible(Button button, bool visible)
