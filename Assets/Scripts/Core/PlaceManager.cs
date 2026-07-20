@@ -142,7 +142,16 @@ namespace Core
                 _currentPlace = _startingPlace;
                 _circusManager?.SelectPlace(_currentPlace);
                 _onPlaceChanged?.Invoke(_currentPlace);
-                Debug.Log($"[PlaceManager] Place de départ : '{_currentPlace.name}'");
+
+                // Warp immédiat à la position et orientation de la Place de départ
+                if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh)
+                {
+                    _navMeshAgent.Warp(_currentPlace.TargetPosition);
+                    _navMeshAgent.transform.rotation = _currentPlace.LookRotation;
+                }
+
+                Debug.Log($"[PlaceManager] Place de départ : '{_currentPlace.name}' " +
+                    $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
             }
 
             RefreshButtons();
