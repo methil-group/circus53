@@ -74,6 +74,8 @@ namespace Core
         private float _alignDelay;
         private Quaternion _alignFromRotation;
         private Quaternion _alignToRotation;
+        private float _alignWobbleX;
+        private float _alignWobbleZ;
         private float _debugNextLogTime;
 
         // Live editor sync
@@ -325,6 +327,10 @@ namespace Core
             _alignFromRotation = _navMeshAgent.transform.rotation;
             _alignToRotation = _targetPlace.LookRotation;
 
+            // Wobble aléatoire sur les axes X (pitch) et Z (roll) pour l'effet essouflé
+            _alignWobbleX = Random.Range(-3f, 3f);
+            _alignWobbleZ = Random.Range(-1.5f, 1.5f);
+
             _alignDelay = Random.Range(_lookDelayMin, _lookDelayMax);
             _alignTimer = 0f;
             _state = State.AligningView;
@@ -370,11 +376,23 @@ namespace Core
             float t = activeTime / activeDuration;
             float humanT = HumanLookCurve(t);
 
-            _navMeshAgent.transform.rotation = Quaternion.SlerpUnclamped(
+            // Rotation principale (Y) avec overshoot
+            Quaternion baseRotation = Quaternion.SlerpUnclamped(
                 _alignFromRotation,
                 _alignToRotation,
                 humanT
             );
+
+            // Wobble X (pitch) et Z (roll) : suit la saccade (0→1→0, pic à t=0.7)
+            float wobbleFactor = t < 0.7f ? (t / 0.7f) : (1f - (t - 0.7f) / 0.3f);
+
+            Quaternion wobble = Quaternion.Euler(
+                _alignWobbleX * wobbleFactor,
+                0f,
+                _alignWobbleZ * wobbleFactor
+            );
+
+            _navMeshAgent.transform.rotation = baseRotation * wobble;
         }
 
         /// <summary>
