@@ -30,7 +30,7 @@ namespace Core
         [SerializeField] private Button _rightButton;
 
         [Header("Navigation")]
-        [SerializeField] private float _speed = 4f;
+        [SerializeField] private float _speed = 10f;
         [SerializeField] private float _arrivalThreshold = 1.5f;
         [SerializeField] private float _lookAtDuration = 0.8f;
         [SerializeField] private float _rotationSpeed = 360f;

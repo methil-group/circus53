@@ -13,9 +13,9 @@ namespace Core
 
         public void SelectPlace(Place selectedPlace)
         {
-            if (selectedPlace == null || !_places.Contains(selectedPlace)) return;
+            if (selectedPlace == null) return;
 
-            if (_exclusivePlaceObjects)
+            if (_exclusivePlaceObjects && _places.Contains(selectedPlace))
             {
                 foreach (Place place in _places)
                 {
@@ -29,7 +29,8 @@ namespace Core
             }
 
             selectedPlace.Apply();
-            Debug.Log($"[CircusManager] Endroit sélectionné : {selectedPlace.name}");
+            Debug.Log($"[CircusManager] Endroit sélectionné : {selectedPlace.name}" +
+                (_places.Contains(selectedPlace) ? "" : " (pas dans la liste _places — appliqué sans exclusivité)"));
         }
 
         /// <summary>Ajoute les Place manquants sans modifier la configuration existante.</summary>
