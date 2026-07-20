@@ -229,7 +229,7 @@ namespace Core
             _navMeshAgent.ResetPath();
 
             _alignFromRotation = _navMeshAgent.transform.rotation;
-            _alignToRotation = _targetPlace.TargetRotation;
+            _alignToRotation = _targetPlace.LookRotation;
             _alignTimer = 0f;
             _state = State.AligningView;
 
