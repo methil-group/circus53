@@ -2,6 +2,7 @@ using System;
 using Framework;
 using Framework.Camera;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 namespace Core.Player
@@ -21,6 +22,7 @@ namespace Core.Player
         [SerializeField] private bool canMove = true;
         [SerializeField] private float speed = 4f;
         [SerializeField] private float arrivalThreshold = 1.5f;
+        [SerializeField] private float acceleration = 100f;
 
         [Header("Look Before Walk")]
         [SerializeField] private bool lookBeforeWalk = true;
@@ -42,10 +44,6 @@ namespace Core.Player
         [SerializeField] private AnimationCurve _bobCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
         [SerializeField] private float _bobSmoothSpeed = 8f;
 
-        [Header("Stuck Detection")]
-        [SerializeField] private float stuckTimeout = 1.5f;
-        [SerializeField] private float stuckDistanceDelta = 0.05f;
-
         [Header("Inputs (optional — fallback to Mouse.current)")]
         [SerializeField] private InputActionReference pointAction;
         [SerializeField] private InputActionReference clickAction;
@@ -56,7 +54,7 @@ namespace Core.Player
 
         // =======================================================================
 
-        private CharacterController _characterController;
+        private NavMeshAgent _navMeshAgent;
         private PlayerController _controller;
         private Transform _cameraTransform;
         private PointAndClickRayDebug _rayDebug;
@@ -79,11 +77,6 @@ namespace Core.Player
         private float _alignViewDuration;
         private Quaternion _alignViewFromRotation;
         private Quaternion _alignViewToRotation;
-
-        // Stuck detection
-        private float _stuckTimer;
-        private float _lastStuckDistance;
-        private bool _stuckInitialized;
 
         // Head bob
         private float _bobPhase;
@@ -110,11 +103,34 @@ namespace Core.Player
         public override void Start(PlayerController controller)
         {
             _controller = controller;
-            _characterController = controller.CharacterController;
             _cameraTransform = controller.CameraTransform;
             _rayDebug = controller.GetComponent<PointAndClickRayDebug>();
             if (_rayDebug == null)
                 _rayDebug = controller.gameObject.AddComponent<PointAndClickRayDebug>();
+
+            // NavMeshAgent : utilise le CharacterController existant pour copier rayon/hauteur
+            _navMeshAgent = controller.GetComponent<NavMeshAgent>();
+            if (_navMeshAgent == null)
+            {
+                _navMeshAgent = controller.gameObject.AddComponent<NavMeshAgent>();
+                CharacterController cc = controller.CharacterController;
+                if (cc != null)
+                {
+                    _navMeshAgent.radius = cc.radius;
+                    _navMeshAgent.height = cc.height;
+                    _navMeshAgent.baseOffset = cc.center.y - cc.height * 0.5f + _navMeshAgent.height * 0.5f;
+                }
+            }
+
+            _navMeshAgent.speed = speed;
+            _navMeshAgent.angularSpeed = rotationSpeed;
+            _navMeshAgent.acceleration = acceleration;
+            _navMeshAgent.stoppingDistance = arrivalThreshold;
+            _navMeshAgent.autoBraking = true;
+            _navMeshAgent.updatePosition = true;
+            _navMeshAgent.updateRotation = false;
+            _navMeshAgent.updateUpAxis = true;
+            _navMeshAgent.isStopped = true;
 
             if (_cameraTransform != null)
             {
@@ -154,7 +170,7 @@ namespace Core.Player
 
         public override void Update(PlayerController controller)
         {
-            if (_characterController == null || _cameraTransform == null) return;
+            if (_navMeshAgent == null || _cameraTransform == null) return;
 
             float dt = Time.deltaTime;
 
@@ -302,11 +318,11 @@ namespace Core.Player
 
         private void StartTravelToCurrentTarget()
         {
-            _stuckTimer = 0f;
-            _stuckInitialized = false;
-
             string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
             Debug.Log($"[PointAndClick] Cible: '{targetName}' (targetPos: {_targetPosition})");
+
+            _navMeshAgent.isStopped = true;
+            _navMeshAgent.SetDestination(_targetPosition);
 
             if (lookBeforeWalk)
             {
@@ -316,6 +332,7 @@ namespace Core.Player
             }
             else
             {
+                _navMeshAgent.isStopped = false;
                 _state = State.Walking;
                 _isMoving = true;
                 Debug.Log($"[PointAndClick] Démarrage direct WALK");
@@ -331,14 +348,14 @@ namespace Core.Player
             _lookTimer += dt;
 
             // Rotation du joueur pour faire face à la cible
-            Vector3 toTarget = _targetPosition - _characterController.transform.position;
+            Vector3 toTarget = _targetPosition - _controller.transform.position;
             toTarget.y = 0f;
 
             if (toTarget.sqrMagnitude > 0.001f)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(toTarget.normalized, Vector3.up);
-                _characterController.transform.rotation = Quaternion.RotateTowards(
-                    _characterController.transform.rotation,
+                _controller.transform.rotation = Quaternion.RotateTowards(
+                    _controller.transform.rotation,
                     targetRotation,
                     rotationSpeed * 2f * dt // 2x plus rapide que la rotation de marche
                 );
@@ -347,6 +364,7 @@ namespace Core.Player
             // Après la durée de look, on commence à marcher
             if (_lookTimer >= lookDuration)
             {
+                _navMeshAgent.isStopped = false;
                 _state = State.Walking;
                 _isMoving = true;
                 string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
@@ -362,80 +380,47 @@ namespace Core.Player
         {
             if (_currentTarget == null && _currentCameraPoint == null)
             {
-                Debug.Log("[PointAndClick] UpdateMovement: _currentTarget est null, retour à Idle.");
-                _state = State.Idle;
-                _isMoving = false;
+                Debug.Log("[PointAndClick] UpdateMovement: cible null, retour à Idle.");
+                StopNavigation();
                 return;
             }
 
-            Vector3 currentPos = _characterController.transform.position;
-            Vector3 toTarget = _targetPosition - currentPos;
-            Vector3 horizontalToTarget = toTarget;
-            horizontalToTarget.y = 0f;
-            float horizontalDistance = horizontalToTarget.magnitude;
+            // Vérifier si le path est valide
+            if (_navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
+            {
+                Debug.LogWarning($"[PointAndClick] Chemin invalide vers la cible — abandon.");
+                OnArrivedFallback();
+                return;
+            }
 
             // Log périodique
             if (Time.time > _debugNextLogTime)
             {
                 _debugNextLogTime = Time.time + 0.5f;
-                Debug.Log($"[PointAndClick] Distance: {horizontalDistance:F2} (seuil: {arrivalThreshold})");
+                float remaining = _navMeshAgent.hasPath ? _navMeshAgent.remainingDistance : float.MaxValue;
+                Debug.Log($"[PointAndClick] remainingDistance: {remaining:F2} (stoppingDistance: {_navMeshAgent.stoppingDistance})");
             }
 
             // Arrivée ?
-            if (horizontalDistance <= arrivalThreshold)
+            if (!_navMeshAgent.pathPending && _navMeshAgent.hasPath &&
+                _navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
             {
-                Debug.Log($"[PointAndClick] ARRIVÉ ! dist={horizontalDistance:F2}");
+                Debug.Log($"[PointAndClick] ARRIVÉ ! remainingDistance={_navMeshAgent.remainingDistance:F2}");
                 OnArrived();
                 return;
             }
 
-            // Stuck detection
-            if (_stuckInitialized)
+            // Rotation vers la direction de déplacement (là où le NavMeshAgent va)
+            Vector3 desiredVelocity = _navMeshAgent.desiredVelocity;
+            if (desiredVelocity.sqrMagnitude > 0.01f)
             {
-                float improvement = _lastStuckDistance - horizontalDistance;
-                if (improvement < stuckDistanceDelta)
-                {
-                    _stuckTimer += dt;
-                    if (_stuckTimer > stuckTimeout)
-                    {
-                        Debug.Log($"[PointAndClick] COINCÉ — arrivée forcée. dist={horizontalDistance:F2}");
-                        OnArrived();
-                        return;
-                    }
-                }
-                else
-                {
-                    _stuckTimer = 0f;
-                }
-            }
-            else
-            {
-                _stuckInitialized = true;
-                _stuckTimer = 0f;
-            }
-            _lastStuckDistance = horizontalDistance;
-
-            // Rotation vers la direction de marche
-            if (horizontalDistance > 0.01f)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(horizontalToTarget.normalized, Vector3.up);
-                _characterController.transform.rotation = Quaternion.RotateTowards(
-                    _characterController.transform.rotation,
+                Quaternion targetRotation = Quaternion.LookRotation(desiredVelocity.normalized, Vector3.up);
+                _controller.transform.rotation = Quaternion.RotateTowards(
+                    _controller.transform.rotation,
                     targetRotation,
                     rotationSpeed * dt
                 );
             }
-
-            // Déplacement
-            Vector3 moveDir = horizontalToTarget.normalized;
-            Vector3 move = moveDir * speed;
-
-            if (_characterController.isGrounded && move.y < 0)
-                move.y = -2f;
-            else if (!_characterController.isGrounded)
-                move.y += Physics.gravity.y * dt;
-
-            _characterController.Move(move * dt);
         }
 
         private void UpdateAligningView(float dt)
@@ -458,10 +443,32 @@ namespace Core.Player
             }
         }
 
+        private void StopNavigation()
+        {
+            _state = State.Idle;
+            _isMoving = false;
+            _currentTarget = null;
+            _currentCameraPoint = null;
+            if (_navMeshAgent != null)
+            {
+                _navMeshAgent.isStopped = true;
+                _navMeshAgent.ResetPath();
+            }
+        }
+
+        /// <summary>Arrivée même si le path est invalide (fallback sans rien appliquer).</summary>
+        private void OnArrivedFallback()
+        {
+            Debug.Log("[PointAndClick] Arrivée fallback (path invalide ou autre).");
+            StopNavigation();
+        }
+
         private void OnArrived()
         {
             _state = State.Idle;
             _isMoving = false;
+            _navMeshAgent.isStopped = true;
+            _navMeshAgent.ResetPath();
 
             if (_currentCameraPoint != null)
             {
@@ -522,7 +529,7 @@ namespace Core.Player
 
             Vector3 targetBob = Vector3.zero;
 
-            if (_state == State.Walking)
+            if (_state == State.Walking && _navMeshAgent != null && _navMeshAgent.velocity.sqrMagnitude > 0.01f)
             {
                 _bobPhase += speed * _bobFrequency * dt;
                 float phase = _bobPhase % (Mathf.PI * 2f);
