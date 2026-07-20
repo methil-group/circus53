@@ -58,10 +58,12 @@ namespace Core
         public Place LeftPlace => _currentPlace != null ? _currentPlace.LeftPlace : null;
         public Place RightPlace => _currentPlace != null ? _currentPlace.RightPlace : null;
 
-        public bool CanGoFront => FrontPlace != null && _state == State.Idle;
-        public bool CanGoBack => BackPlace != null && _state == State.Idle;
-        public bool CanGoLeft => LeftPlace != null && _state == State.Idle;
-        public bool CanGoRight => RightPlace != null && _state == State.Idle;
+        public bool CanGoFront => FrontPlace != null;
+        public bool CanGoBack => BackPlace != null;
+        public bool CanGoLeft => LeftPlace != null;
+        public bool CanGoRight => RightPlace != null;
+
+        public bool CanNavigate => _state == State.Idle;
 
         public bool IsNavigating => _state != State.Idle;
 
@@ -137,7 +139,7 @@ namespace Core
         /// <summary>Force la navigation vers un Place spécifique (debug ou scripting).</summary>
         public void NavigateTo(Place target)
         {
-            if (target == null || _state != State.Idle)
+            if (target == null || !CanNavigate)
             {
                 Debug.LogWarning($"[PlaceManager] Navigation impossible : target={target?.name}, state={_state}");
                 return;
@@ -256,6 +258,7 @@ namespace Core
                 _navMeshAgent.transform.rotation = _alignToRotation;
                 _state = State.Idle;
                 _targetPlace = null;
+                RefreshButtons();
                 _onNavigationComplete?.Invoke();
                 Debug.Log("[PlaceManager] Navigation terminée.");
             }
@@ -305,12 +308,13 @@ namespace Core
 
         private void RefreshButtons()
         {
-            SetButtonInteractable(_frontButton, CanGoFront);
-            SetButtonInteractable(_backButton, CanGoBack);
-            SetButtonInteractable(_leftButton, CanGoLeft);
-            SetButtonInteractable(_rightButton, CanGoRight);
+            bool canClick = CanNavigate;
+            SetButtonInteractable(_frontButton, CanGoFront && canClick);
+            SetButtonInteractable(_backButton, CanGoBack && canClick);
+            SetButtonInteractable(_leftButton, CanGoLeft && canClick);
+            SetButtonInteractable(_rightButton, CanGoRight && canClick);
 
-            Debug.Log($"[PlaceManager] Boutons mis à jour — " +
+            Debug.Log($"[PlaceManager] Boutons mis à jour (interactable={canClick}) — " +
                 $"Front={(CanGoFront ? (FrontPlace != null ? FrontPlace.name : "?") : "X")} " +
                 $"Back={(CanGoBack ? (BackPlace != null ? BackPlace.name : "?") : "X")} " +
                 $"Left={(CanGoLeft ? (LeftPlace != null ? LeftPlace.name : "?") : "X")} " +
