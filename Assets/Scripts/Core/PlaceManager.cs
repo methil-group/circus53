@@ -40,7 +40,8 @@ namespace Core
         [SerializeField] private bool _enableHeadBob = true;
         [SerializeField, Tooltip("Transform qui reçoit le bob (ex: CameraHolder). Si null, cherche automatiquement.")]
         private Transform _headBobTarget;
-        [SerializeField] private float _bobAmount = 0.08f;
+        [SerializeField] private float _bobAmountX = 0.04f;
+        [SerializeField] private float _bobAmountY = 0.08f;
         [SerializeField] private float _bobFrequency = 5f;
         [SerializeField] private float _bobSmoothSpeed = 10f;
 
@@ -429,8 +430,8 @@ namespace Core
             {
                 _bobPhase += _speed * _bobFrequency * dt;
                 float phase = _bobPhase % (Mathf.PI * 2f);
-                float vertical = Mathf.Sin(phase) * _bobAmount;
-                float horizontal = Mathf.Cos(phase * 1.7f) * _bobAmount * 0.5f;
+                float horizontal = Mathf.Cos(phase * 1.7f) * _bobAmountX;
+                float vertical = Mathf.Sin(phase) * _bobAmountY;
 
                 targetBob = new Vector3(horizontal, vertical, 0f);
             }
