@@ -59,6 +59,16 @@ namespace Core
         private float _bobSmoothX = 10f;
         [SerializeField, Tooltip("Transition verticale : temps de lerp vers la position cible. Valeur basse = plus sec, haute = plus fluide.")]
         private float _bobSmoothY = 10f;
+        [SerializeField, Tooltip("Amplitude de rotation en pitch (X). La tête hoche haut/bas en marchant.")]
+        private float _bobRotX = 1.5f;
+        [SerializeField, Tooltip("Amplitude de rotation en yaw (Y). La tête tourne légèrement gauche/droite.")]
+        private float _bobRotY = 1f;
+        [SerializeField, Tooltip("Amplitude de rotation en roll (Z). La tête penche gauche/droite.")]
+        private float _bobRotZ = 0.8f;
+        [SerializeField, Tooltip("Vitesse d'oscillation des rotations de tête.")]
+        private float _bobRotFrequency = 3f;
+        [SerializeField, Tooltip("Transition des rotations : lerp vers l'angle cible. Bas = saccadé, haut = fluide.")]
+        private float _bobRotSmooth = 8f;
 
         [Header("Events")]
         [SerializeField] private UnityEvent<Place> _onPlaceChanged;
@@ -85,6 +95,7 @@ namespace Core
         // Head bob
         private float _bobPhase;
         private Vector3 _defaultBobPosition;
+        private Quaternion _defaultBobRotation;
         private bool _hasDefaultBobPos;
 
         /// <summary>Place actuel du joueur.</summary>
@@ -155,6 +166,7 @@ namespace Core
                 if (_headBobTarget != null)
                 {
                     _defaultBobPosition = _headBobTarget.localPosition;
+                    _defaultBobRotation = _headBobTarget.localRotation;
                     _hasDefaultBobPos = true;
                 }
             }
@@ -261,6 +273,13 @@ namespace Core
 
             _lastPlacePosition = _currentPlace.TargetPosition;
             _lastPlaceRotation = _currentPlace.LookRotation;
+
+            // Reset head bob defaults après warp
+            if (_headBobTarget != null)
+            {
+                _defaultBobPosition = _headBobTarget.localPosition;
+                _defaultBobRotation = _headBobTarget.localRotation;
+            }
 
             Debug.Log($"[PlaceManager] Snap vers '{_currentPlace.name}' " +
                 $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
@@ -544,25 +563,40 @@ namespace Core
             if (!_enableHeadBob || _headBobTarget == null || !_hasDefaultBobPos) return;
 
             Vector3 targetBob = Vector3.zero;
+            Vector3 targetRot = Vector3.zero;
 
             if (_state == State.Walking && _navMeshAgent != null && _navMeshAgent.velocity.sqrMagnitude > 0.01f)
             {
                 float phaseX = _bobPhase * _bobFrequencyX;
                 float phaseY = _bobPhase * _bobFrequencyY;
+                float phaseRot = _bobPhase * _bobRotFrequency;
                 _bobPhase += _speed * dt;
 
                 float horizontal = Mathf.Cos(phaseX) * _bobAmountX;
                 float vertical = Mathf.Sin(phaseY) * _bobAmountY;
-
                 targetBob = new Vector3(horizontal, vertical, 0f);
+
+                float rotX = Mathf.Sin(phaseRot * 0.7f) * _bobRotX;
+                float rotY = Mathf.Cos(phaseRot * 1.3f) * _bobRotY;
+                float rotZ = Mathf.Sin(phaseRot * 1.1f) * _bobRotZ;
+                targetRot = new Vector3(rotX, rotY, rotZ);
             }
 
+            // Position bob
             Vector3 currentPos = _headBobTarget.localPosition;
             Vector3 targetPos = _defaultBobPosition + targetBob;
             _headBobTarget.localPosition = new Vector3(
                 Mathf.Lerp(currentPos.x, targetPos.x, _bobSmoothX * dt),
                 Mathf.Lerp(currentPos.y, targetPos.y, _bobSmoothY * dt),
                 currentPos.z
+            );
+
+            // Rotation bob
+            Quaternion targetRotation = _defaultBobRotation * Quaternion.Euler(targetRot);
+            _headBobTarget.localRotation = Quaternion.Slerp(
+                _headBobTarget.localRotation,
+                targetRotation,
+                _bobRotSmooth * dt
             );
         }
 
@@ -589,6 +623,13 @@ namespace Core
 
                 _lastPlacePosition = currentPos;
                 _lastPlaceRotation = currentRot;
+
+                // Reset head bob defaults après live sync
+                if (_headBobTarget != null)
+                {
+                    _defaultBobPosition = _headBobTarget.localPosition;
+                    _defaultBobRotation = _headBobTarget.localRotation;
+                }
             }
         }
 
