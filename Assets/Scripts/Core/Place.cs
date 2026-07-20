@@ -1,17 +1,12 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core
 {
-    /// <summary>Un endroit cliquable du circus et l'état de décor associé.</summary>
+    /// <summary>Un endroit du circus avec ses voisins et sa direction de regard.</summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(CameraClickPoint))]
     public class Place : MonoBehaviour
     {
-        [Header("Décor")]
-        [SerializeField] private GameObject[] _objectsToActivate = System.Array.Empty<GameObject>();
-        [SerializeField] private GameObject[] _objectsToDeactivate = System.Array.Empty<GameObject>();
-
         [Header("Voisins (navigation nodale)")]
         [SerializeField] private Place _frontPlace;
         [SerializeField] private Place _backPlace;
@@ -22,7 +17,6 @@ namespace Core
         [SerializeField, Tooltip("Direction dans laquelle le joueur regarde quand il est sur ce Place.")]
         private Vector3 _lookDirection = Vector3.forward;
 
-        public IEnumerable<GameObject> ObjectsToActivate => _objectsToActivate;
         public Place FrontPlace => _frontPlace;
         public Place BackPlace => _backPlace;
         public Place LeftPlace => _leftPlace;
@@ -31,33 +25,8 @@ namespace Core
         /// <summary>Position cible pour le joueur (venant du CameraClickPoint).</summary>
         public Vector3 TargetPosition => transform.position;
 
-        /// <summary>Rotation de cadrage pour la caméra (depuis CameraClickPoint).</summary>
-        public Quaternion TargetRotation
-        {
-            get
-            {
-                CameraClickPoint point = GetComponent<CameraClickPoint>();
-                return point != null ? point.GetViewRotation() : transform.rotation;
-            }
-        }
-
         /// <summary>Rotation correspondant à la direction de regard.</summary>
         public Quaternion LookRotation => Quaternion.LookRotation(_lookDirection.normalized, Vector3.up);
-
-        public void Apply()
-        {
-            SetActive(_objectsToActivate, true);
-            SetActive(_objectsToDeactivate, false);
-        }
-
-        private static void SetActive(IEnumerable<GameObject> objects, bool active)
-        {
-            foreach (GameObject gameObject in objects)
-            {
-                if (gameObject != null)
-                    gameObject.SetActive(active);
-            }
-        }
 
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
