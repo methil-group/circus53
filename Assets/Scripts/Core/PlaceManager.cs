@@ -33,7 +33,14 @@ namespace Core
         [SerializeField] private float _speed = 10f;
         [SerializeField] private float _acceleration = 200f;
         [SerializeField] private float _arrivalThreshold = 1.5f;
-        [SerializeField] private float _lookAtDuration = 0.8f;
+        [SerializeField, Tooltip("Durée totale de la rotation de tête à l'arrivée.")]
+        private float _lookAtDuration = 0.8f;
+        [SerializeField, Tooltip("Overshoot de la saccade : la tête dépasse la cible de X% avant de corriger. 0 = pas d'overshoot, 0.1 = 10%.")]
+        [Range(0f, 0.2f)] private float _lookOvershoot = 0.06f;
+        [SerializeField, Tooltip("Délai de réaction minimum avant de tourner la tête (secondes).")]
+        private float _lookDelayMin = 0.05f;
+        [SerializeField, Tooltip("Délai de réaction maximum avant de tourner la tête (secondes).")]
+        private float _lookDelayMax = 0.15f;
         [SerializeField] private float _rotationSpeed = 360f;
 
         [Header("Head Bob")]
@@ -64,6 +71,7 @@ namespace Core
         private Place _currentPlace;
         private Place _targetPlace;
         private float _alignTimer;
+        private float _alignDelay;
         private Quaternion _alignFromRotation;
         private Quaternion _alignToRotation;
         private float _debugNextLogTime;
@@ -316,6 +324,8 @@ namespace Core
 
             _alignFromRotation = _navMeshAgent.transform.rotation;
             _alignToRotation = _targetPlace.LookRotation;
+
+            _alignDelay = Random.Range(_lookDelayMin, _lookDelayMax);
             _alignTimer = 0f;
             _state = State.AligningView;
 
@@ -338,16 +348,15 @@ namespace Core
         private void UpdateAligningView(float dt)
         {
             _alignTimer += dt;
-            float t = Mathf.Clamp01(_alignTimer / _lookAtDuration);
-            t = Mathf.SmoothStep(0f, 1f, t);
 
-            _navMeshAgent.transform.rotation = Quaternion.Slerp(
-                _alignFromRotation,
-                _alignToRotation,
-                t
-            );
+            // Phase 0 : délai de réaction (immobile)
+            if (_alignTimer < _alignDelay)
+                return;
 
-            if (_alignTimer >= _lookAtDuration)
+            float activeTime = _alignTimer - _alignDelay;
+            float activeDuration = _lookAtDuration;
+
+            if (activeTime >= activeDuration)
             {
                 _navMeshAgent.transform.rotation = _alignToRotation;
                 _state = State.Idle;
@@ -355,7 +364,47 @@ namespace Core
                 RefreshButtons();
                 _onNavigationComplete?.Invoke();
                 Debug.Log("[PlaceManager] Navigation terminée.");
+                return;
             }
+
+            float t = activeTime / activeDuration;
+            float humanT = HumanLookCurve(t);
+
+            _navMeshAgent.transform.rotation = Quaternion.SlerpUnclamped(
+                _alignFromRotation,
+                _alignToRotation,
+                humanT
+            );
+        }
+
+        /// <summary>
+        /// Courbe de regard humain : saccade qui dépasse la cible (70% du temps),
+        /// puis correction vers la cible exacte (30% restants).
+        /// Retourne des valeurs de 0 → 1+overshoot → 1, utilisées avec SlerpUnclamped.
+        /// </summary>
+        private float HumanLookCurve(float t)
+        {
+            const float split = 0.7f;
+            float overshoot = _lookOvershoot;
+
+            if (t < split)
+            {
+                // Phase 1 : saccade vers 1 + overshoot
+                float phaseT = t / split;
+                return (1f + overshoot) * SmoothStep(phaseT);
+            }
+            else
+            {
+                // Phase 2 : correction de l'overshoot vers 1.0
+                float phaseT = (t - split) / (1f - split);
+                float start = 1f + overshoot;
+                return Mathf.Lerp(start, 1f, SmoothStep(phaseT));
+            }
+        }
+
+        private static float SmoothStep(float t)
+        {
+            return t * t * (3f - 2f * t);
         }
 
         // =======================================================================
