@@ -38,12 +38,20 @@ namespace Core
 
         [Header("Head Bob")]
         [SerializeField] private bool _enableHeadBob = true;
-        [SerializeField, Tooltip("Transform qui reçoit le bob (ex: CameraHolder). Si null, cherche automatiquement.")]
+        [SerializeField, Tooltip("Transform qui reçoit le bob (ex: CameraHolder). Si null, cherche automatiquement le parent de la Main Camera.")]
         private Transform _headBobTarget;
-        [SerializeField] private float _bobAmountX = 0.04f;
-        [SerializeField] private float _bobAmountY = 0.08f;
-        [SerializeField] private float _bobFrequency = 5f;
-        [SerializeField] private float _bobSmoothSpeed = 10f;
+        [SerializeField, Tooltip("Amplitude du balancement horizontal (cos). Ajoute un mouvement de gauche à droite.")]
+        private float _bobAmountX = 0.04f;
+        [SerializeField, Tooltip("Amplitude du rebond vertical (sin). Ajoute un mouvement de haut en bas.")]
+        private float _bobAmountY = 0.08f;
+        [SerializeField, Tooltip("Vitesse d'oscillation horizontale. Plus la valeur est haute, plus le balancement latéral est rapide.")]
+        private float _bobFrequencyX = 8.5f;
+        [SerializeField, Tooltip("Vitesse d'oscillation verticale. Plus la valeur est haute, plus le rebond est rapide.")]
+        private float _bobFrequencyY = 5f;
+        [SerializeField, Tooltip("Transition horizontale : temps de lerp vers la position cible. Valeur basse = plus sec, haute = plus fluide.")]
+        private float _bobSmoothX = 10f;
+        [SerializeField, Tooltip("Transition verticale : temps de lerp vers la position cible. Valeur basse = plus sec, haute = plus fluide.")]
+        private float _bobSmoothY = 10f;
 
         [Header("Events")]
         [SerializeField] private UnityEvent<Place> _onPlaceChanged;
@@ -472,18 +480,22 @@ namespace Core
 
             if (_state == State.Walking && _navMeshAgent != null && _navMeshAgent.velocity.sqrMagnitude > 0.01f)
             {
-                _bobPhase += _speed * _bobFrequency * dt;
-                float phase = _bobPhase % (Mathf.PI * 2f);
-                float horizontal = Mathf.Cos(phase * 1.7f) * _bobAmountX;
-                float vertical = Mathf.Sin(phase) * _bobAmountY;
+                float phaseX = _bobPhase * _bobFrequencyX;
+                float phaseY = _bobPhase * _bobFrequencyY;
+                _bobPhase += _speed * dt;
+
+                float horizontal = Mathf.Cos(phaseX) * _bobAmountX;
+                float vertical = Mathf.Sin(phaseY) * _bobAmountY;
 
                 targetBob = new Vector3(horizontal, vertical, 0f);
             }
 
-            _headBobTarget.localPosition = Vector3.Lerp(
-                _headBobTarget.localPosition,
-                _defaultBobPosition + targetBob,
-                _bobSmoothSpeed * dt
+            Vector3 currentPos = _headBobTarget.localPosition;
+            Vector3 targetPos = _defaultBobPosition + targetBob;
+            _headBobTarget.localPosition = new Vector3(
+                Mathf.Lerp(currentPos.x, targetPos.x, _bobSmoothX * dt),
+                Mathf.Lerp(currentPos.y, targetPos.y, _bobSmoothY * dt),
+                currentPos.z
             );
         }
 
