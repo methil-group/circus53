@@ -15,7 +15,7 @@ namespace Core.Player
     [Serializable]
     public class PlayerPointAndClick : Updatable<PlayerController>
     {
-        private enum State { Idle, Looking, Walking }
+        private enum State { Idle, Looking, Walking, AligningView }
 
         [Header("Movement")]
         [SerializeField] private bool canMove = true;
@@ -57,18 +57,28 @@ namespace Core.Player
         // =======================================================================
 
         private CharacterController _characterController;
+        private PlayerController _controller;
         private Transform _cameraTransform;
+        private PointAndClickRayDebug _rayDebug;
         private Transform _bobTarget;
         private MethilCamera _methilCamera;
 
         private State _state = State.Idle;
         private ClickableZone _currentTarget;
+        private CameraClickPoint _currentCameraPoint;
         private ClickableZone _hoveredZone;
+        private CameraClickPoint _hoveredCameraPoint;
         private Vector3 _targetPosition;
         private bool _isMoving;
 
         // Look-before-walk
         private float _lookTimer;
+
+        // Smooth view alignment on camera point arrival
+        private float _alignViewTimer;
+        private float _alignViewDuration;
+        private Quaternion _alignViewFromRotation;
+        private Quaternion _alignViewToRotation;
 
         // Stuck detection
         private float _stuckTimer;
@@ -80,6 +90,8 @@ namespace Core.Player
         private Vector3 _currentBobOffset;
         private Vector3 _defaultBobPosition;
         private bool _hasDefaultBobPos;
+        private Ray _lastInteractionRay;
+        private RaycastHit[] _lastInteractionHits = Array.Empty<RaycastHit>();
 
         // Debug
         private float _debugNextLogTime;
@@ -97,8 +109,12 @@ namespace Core.Player
 
         public override void Start(PlayerController controller)
         {
+            _controller = controller;
             _characterController = controller.CharacterController;
             _cameraTransform = controller.CameraTransform;
+            _rayDebug = controller.GetComponent<PointAndClickRayDebug>();
+            if (_rayDebug == null)
+                _rayDebug = controller.gameObject.AddComponent<PointAndClickRayDebug>();
 
             if (_cameraTransform != null)
             {
@@ -162,6 +178,10 @@ namespace Core.Player
                 case State.Walking:
                     UpdateMovement(dt);
                     break;
+
+                case State.AligningView:
+                    UpdateAligningView(dt);
+                    break;
             }
 
             // Head bob toujours mis à jour
@@ -181,24 +201,77 @@ namespace Core.Player
             if (cam == null) return;
 
             Ray ray = cam.ScreenPointToRay(mousePos);
+            _lastInteractionRay = ray;
 
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f))
+            ClickableZone zone = null;
+            CameraClickPoint cameraPoint = null;
+            float nearestInteractiveDistance = float.MaxValue;
+
+            // Le blocking possède aussi des colliders : RaycastAll évite qu'un mur
+            // masque les points-caméra placés derrière lui.
+            _lastInteractionHits = Physics.RaycastAll(ray, 100f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
+            foreach (RaycastHit hit in _lastInteractionHits)
             {
-                var zone = hit.collider.GetComponent<ClickableZone>();
-                if (zone != _hoveredZone)
-                {
-                    _hoveredZone = zone;
+                ClickableZone candidateZone = hit.collider.GetComponentInParent<ClickableZone>();
+                CameraClickPoint candidateCameraPoint = hit.collider.GetComponentInParent<CameraClickPoint>();
 
-                    if (zone != null && zone.CursorIcon != null)
-                        SetCursor(zone.CursorIcon, zone.CursorHotspot);
-                    else
-                        SetCursor(defaultCursor, defaultCursorHotspot);
-                }
+                if ((candidateZone == null && candidateCameraPoint == null) || hit.distance >= nearestInteractiveDistance)
+                    continue;
+
+                nearestInteractiveDistance = hit.distance;
+                zone = candidateZone;
+                cameraPoint = candidateCameraPoint;
             }
-            else if (_hoveredZone != null)
+
+            // Une zone de 0.05 unité est idéale pour ne pas gêner les colliders
+            // du décor, mais trop petite pour être visée à distance. Quand les
+            // gizmos sont visibles, on autorise donc aussi un clic près de
+            // l'icône caméra affichée à l'écran.
+            if (zone == null && cameraPoint == null)
+                cameraPoint = FindCameraPointNearCursor(cam, mousePos);
+
+            if (cameraPoint != _hoveredCameraPoint || zone != _hoveredZone)
             {
-                _hoveredZone = null;
-                SetCursor(defaultCursor, defaultCursorHotspot);
+                _hoveredZone = zone;
+                _hoveredCameraPoint = cameraPoint;
+
+                if (zone != null && zone.CursorIcon != null)
+                    SetCursor(zone.CursorIcon, zone.CursorHotspot);
+                else
+                    SetCursor(defaultCursor, defaultCursorHotspot);
+            }
+        }
+
+        private static CameraClickPoint FindCameraPointNearCursor(UnityEngine.Camera camera, Vector2 mousePosition)
+        {
+            CameraClickPoint closest = null;
+            float closestDistanceSqr = float.MaxValue;
+
+            foreach (CameraClickPoint point in UnityEngine.Resources.FindObjectsOfTypeAll<CameraClickPoint>())
+            {
+                Vector3 screenPosition = camera.WorldToScreenPoint(point.transform.position);
+                if (screenPosition.z <= 0f) continue;
+
+                float distanceSqr = ((Vector2)screenPosition - mousePosition).sqrMagnitude;
+                float radius = point.ScreenClickRadius;
+                if (distanceSqr > radius * radius || distanceSqr >= closestDistanceSqr) continue;
+
+                closest = point;
+                closestDistanceSqr = distanceSqr;
+            }
+
+            return closest;
+        }
+
+        private void LogLastRaycast()
+        {
+            _rayDebug?.Record(_lastInteractionRay, _lastInteractionHits);
+            Debug.Log($"[PointAndClick] Ray: origin={_lastInteractionRay.origin}, direction={_lastInteractionRay.direction}, hits={_lastInteractionHits.Length}");
+
+            foreach (RaycastHit hit in _lastInteractionHits)
+            {
+                Collider collider = hit.collider;
+                Debug.Log($"[PointAndClick] Hit: '{collider.name}' | layer={LayerMask.LayerToName(collider.gameObject.layer)} ({collider.gameObject.layer}) | distance={hit.distance:F3} | zone={collider.GetComponentInParent<ClickableZone>() != null} | cameraPoint={collider.GetComponentInParent<CameraClickPoint>() != null}");
             }
         }
 
@@ -209,15 +282,31 @@ namespace Core.Player
         private void UpdateClick()
         {
             if (!IsClickPressed()) return;
-            Debug.Log($"[PointAndClick] Clic détecté. HoveredZone = {(_hoveredZone != null ? _hoveredZone.name : "NULL")}");
+            LogLastRaycast();
+            Debug.Log($"[PointAndClick] Clic détecté. Zone = {(_hoveredZone != null ? _hoveredZone.name : "NULL")}, CameraPoint = {(_hoveredCameraPoint != null ? _hoveredCameraPoint.name : "NULL")}");
+            if (_hoveredCameraPoint != null)
+            {
+                _currentTarget = null;
+                _currentCameraPoint = _hoveredCameraPoint;
+                _targetPosition = _currentCameraPoint.transform.position;
+                StartTravelToCurrentTarget();
+                return;
+            }
             if (_hoveredZone == null) return;
 
             _currentTarget = _hoveredZone;
+            _currentCameraPoint = null;
             _targetPosition = _currentTarget.TargetPosition;
+            StartTravelToCurrentTarget();
+        }
+
+        private void StartTravelToCurrentTarget()
+        {
             _stuckTimer = 0f;
             _stuckInitialized = false;
 
-            Debug.Log($"[PointAndClick] Cible: '{_currentTarget.name}' (targetPos: {_targetPosition})");
+            string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
+            Debug.Log($"[PointAndClick] Cible: '{targetName}' (targetPos: {_targetPosition})");
 
             if (lookBeforeWalk)
             {
@@ -260,7 +349,8 @@ namespace Core.Player
             {
                 _state = State.Walking;
                 _isMoving = true;
-                Debug.Log($"[PointAndClick] Look terminé, marche vers '{_currentTarget.name}'");
+                string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
+                Debug.Log($"[PointAndClick] Look terminé, marche vers '{targetName}'");
             }
         }
 
@@ -270,7 +360,7 @@ namespace Core.Player
 
         private void UpdateMovement(float dt)
         {
-            if (_currentTarget == null)
+            if (_currentTarget == null && _currentCameraPoint == null)
             {
                 Debug.Log("[PointAndClick] UpdateMovement: _currentTarget est null, retour à Idle.");
                 _state = State.Idle;
@@ -348,10 +438,50 @@ namespace Core.Player
             _characterController.Move(move * dt);
         }
 
+        private void UpdateAligningView(float dt)
+        {
+            _alignViewTimer += dt;
+            float t = Mathf.Clamp01(_alignViewTimer / _alignViewDuration);
+            t = Mathf.SmoothStep(0f, 1f, t); // ease-in-out
+
+            _controller.transform.rotation = Quaternion.Slerp(
+                _alignViewFromRotation,
+                _alignViewToRotation,
+                t
+            );
+
+            if (_alignViewTimer >= _alignViewDuration)
+            {
+                _controller.transform.rotation = _alignViewToRotation;
+                _state = State.Idle;
+                Debug.Log("[PointAndClick] Alignement vue terminé.");
+            }
+        }
+
         private void OnArrived()
         {
             _state = State.Idle;
             _isMoving = false;
+
+            if (_currentCameraPoint != null)
+            {
+                Debug.Log($"[PointAndClick] Arrivé au point caméra '{_currentCameraPoint.name}'");
+
+                // Active le Place immédiatement (objets à activer/désactiver)
+                _currentCameraPoint.SelectPlace();
+
+                // Transition fluide de la vue vers le cadrage de la caméra
+                Quaternion rotationDelta = _currentCameraPoint.GetViewRotationDelta(_controller);
+                _alignViewFromRotation = _controller.transform.rotation;
+                _alignViewToRotation = rotationDelta * _controller.transform.rotation;
+                _alignViewTimer = 0f;
+                _alignViewDuration = lookAtDuration;
+                _state = State.AligningView;
+
+                Debug.Log($"[PointAndClick] Début alignement vue ({_alignViewDuration}s)");
+                _currentCameraPoint = null;
+                return;
+            }
 
             Debug.Log($"[PointAndClick] Arrivé à la zone '{_currentTarget.name}'");
 
