@@ -60,6 +60,10 @@ namespace Core
         private Quaternion _alignToRotation;
         private float _debugNextLogTime;
 
+        // Live editor sync
+        private Vector3 _lastPlacePosition;
+        private Quaternion _lastPlaceRotation;
+
         // Head bob
         private float _bobPhase;
         private Vector3 _defaultBobPosition;
@@ -150,6 +154,10 @@ namespace Core
                     _navMeshAgent.transform.rotation = _currentPlace.LookRotation;
                 }
 
+                // Init trackers pour le live sync
+                _lastPlacePosition = _currentPlace.TargetPosition;
+                _lastPlaceRotation = _currentPlace.LookRotation;
+
                 Debug.Log($"[PlaceManager] Place de départ : '{_currentPlace.name}' " +
                     $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
             }
@@ -164,6 +172,7 @@ namespace Core
             switch (_state)
             {
                 case State.Idle:
+                    LiveSyncCurrentPlace();
                     break;
 
                 case State.Walking:
@@ -231,6 +240,9 @@ namespace Core
                 _navMeshAgent.Warp(_currentPlace.TargetPosition);
                 _navMeshAgent.transform.rotation = _currentPlace.LookRotation;
             }
+
+            _lastPlacePosition = _currentPlace.TargetPosition;
+            _lastPlaceRotation = _currentPlace.LookRotation;
 
             Debug.Log($"[PlaceManager] Snap vers '{_currentPlace.name}' " +
                 $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
@@ -305,6 +317,10 @@ namespace Core
             _circusManager?.SelectPlace(_currentPlace);
             _onPlaceChanged?.Invoke(_currentPlace);
             RefreshButtons();
+
+            // Init trackers pour le live sync
+            _lastPlacePosition = _currentPlace.TargetPosition;
+            _lastPlaceRotation = _currentPlace.LookRotation;
 
             Debug.Log($"[PlaceManager] Place changé : '{previousPlace?.name}' → '{_currentPlace.name}'");
 
@@ -469,6 +485,32 @@ namespace Core
                 _defaultBobPosition + targetBob,
                 _bobSmoothSpeed * dt
             );
+        }
+
+        // =======================================================================
+
+        // =======================================================================
+        // Live Editor Sync
+        // =======================================================================
+
+        private void LiveSyncCurrentPlace()
+        {
+            if (_currentPlace == null || _navMeshAgent == null) return;
+
+            Vector3 currentPos = _currentPlace.TargetPosition;
+            Quaternion currentRot = _currentPlace.LookRotation;
+
+            if (currentPos != _lastPlacePosition || currentRot != _lastPlaceRotation)
+            {
+                if (_navMeshAgent.isOnNavMesh)
+                {
+                    _navMeshAgent.Warp(currentPos);
+                    _navMeshAgent.transform.rotation = currentRot;
+                }
+
+                _lastPlacePosition = currentPos;
+                _lastPlaceRotation = currentRot;
+            }
         }
 
         // =======================================================================
