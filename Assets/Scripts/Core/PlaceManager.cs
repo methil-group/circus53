@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Core
@@ -268,8 +269,6 @@ namespace Core
         }
 
         // =======================================================================
-
-        // =======================================================================
         // UI Buttons
         // =======================================================================
 
@@ -281,13 +280,51 @@ namespace Core
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(action);
 
-            // Désactiver l'Image du bouton
-            Graphic graphic = button.targetGraphic;
-            if (graphic != null)
-                graphic.enabled = false;
+            // Désactiver l'Image native du bouton
+            Graphic nativeGraphic = button.targetGraphic;
+            if (nativeGraphic != null)
+                nativeGraphic.enabled = false;
 
-            // Cacher tous les enfants par défaut
-            SetFirstChildVisible(button, false);
+            // Forcer la transition couleur sur le bouton
+            button.transition = Selectable.Transition.ColorTint;
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+
+            // Remplacer le targetGraphic par l'Image du premier enfant
+            // pour que la transition couleur du Button s'applique dessus
+            if (button.transform.childCount > 0)
+            {
+                Transform firstChild = button.transform.GetChild(0);
+                Image childImage = firstChild.GetComponent<Image>();
+                if (childImage != null)
+                {
+                    button.targetGraphic = childImage;
+                    childImage.enabled = false;
+                }
+
+                // Désactiver le Raycast Target sur les Graphic des enfants
+                foreach (Graphic graphic in firstChild.GetComponentsInChildren<Graphic>(includeInactive: true))
+                {
+                    graphic.raycastTarget = false;
+                }
+            }
+
+            // Cacher l'enfant par défaut
+            SetFirstChildActive(button, false);
+
+            // EventTrigger pour hover
+            EventTrigger trigger = button.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null)
+                trigger = button.gameObject.AddComponent<EventTrigger>();
+
+            trigger.triggers.Clear();
+
+            EventTrigger.Entry enter = new() { eventID = EventTriggerType.PointerEnter };
+            enter.callback.AddListener(_ => OnButtonHover(button, true));
+            trigger.triggers.Add(enter);
+
+            EventTrigger.Entry exit = new() { eventID = EventTriggerType.PointerExit };
+            exit.callback.AddListener(_ => OnButtonHover(button, false));
+            trigger.triggers.Add(exit);
         }
 
         private void RefreshButtons()
@@ -310,26 +347,38 @@ namespace Core
             if (button == null) return;
             button.interactable = interactable;
 
-            // L'Image du bouton reste TOUJOURS désactivée
-            // Seul le premier enfant s'affiche/masque
-            SetFirstChildVisible(button, interactable);
+            // Si désactivé, cacher l'enfant et désactiver son Image
+            if (!interactable)
+            {
+                SetFirstChildActive(button, false);
+                SetChildImageEnabled(button, false);
+            }
         }
 
-        private static void SetFirstChildVisible(Button button, bool visible)
+        private void OnButtonHover(Button button, bool hover)
+        {
+            if (button == null) return;
+
+            bool show = hover && button.interactable;
+            SetFirstChildActive(button, show);
+            SetChildImageEnabled(button, show);
+        }
+
+        private static void SetFirstChildActive(Button button, bool active)
         {
             if (button == null || button.transform.childCount == 0) return;
             Transform firstChild = button.transform.GetChild(0);
             if (firstChild != null)
-            {
-                firstChild.gameObject.SetActive(visible);
+                firstChild.gameObject.SetActive(active);
+        }
 
-                // Désactiver le Raycast Target sur les Graphic des enfants
-                // pour ne pas interférer avec le hover du Button parent
-                foreach (Graphic graphic in firstChild.GetComponentsInChildren<Graphic>(includeInactive: true))
-                {
-                    graphic.raycastTarget = false;
-                }
-            }
+        private static void SetChildImageEnabled(Button button, bool enabled)
+        {
+            // Enable/disable the targetGraphic (which is the child's Image)
+            // so the Button's Color Tint transition can animate it on hover
+            Graphic graphic = button?.targetGraphic;
+            if (graphic != null)
+                graphic.enabled = enabled;
         }
 
         // =======================================================================
