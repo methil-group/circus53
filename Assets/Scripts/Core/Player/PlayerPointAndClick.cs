@@ -119,7 +119,6 @@ namespace Core.Player
                 }
             }
 
-            _navMeshAgent.speed = speed;
             _navMeshAgent.angularSpeed = rotationSpeed;
             _navMeshAgent.acceleration = acceleration;
             _navMeshAgent.stoppingDistance = arrivalThreshold;
