@@ -86,9 +86,6 @@ namespace Core.Player
         private Ray _lastInteractionRay;
         private RaycastHit[] _lastInteractionHits = Array.Empty<RaycastHit>();
 
-        // Debug
-        private float _debugNextLogTime;
-
         /// <summary>Active ou désactive le déplacement point & click.</summary>
         public void SetActive(bool active) => canMove = active;
 
@@ -153,14 +150,6 @@ namespace Core.Player
             if (_cameraTransform != null)
             {
                 _methilCamera = _cameraTransform.GetComponent<MethilCamera>();
-                if (_methilCamera != null)
-                    Debug.Log($"[PointAndClick] MethilCamera trouvé sur '{_cameraTransform.name}'");
-                else
-                    Debug.LogWarning($"[PointAndClick] MethilCamera INTROUVABLE sur '{_cameraTransform.name}'.");
-            }
-            else
-            {
-                Debug.LogWarning("[PointAndClick] CameraTransform est null !");
             }
 
             // Init bob transform
@@ -297,18 +286,6 @@ namespace Core.Player
             return closest;
         }
 
-        private void LogLastRaycast()
-        {
-            _rayDebug?.Record(_lastInteractionRay, _lastInteractionHits);
-            Debug.Log($"[PointAndClick] Ray: origin={_lastInteractionRay.origin}, direction={_lastInteractionRay.direction}, hits={_lastInteractionHits.Length}");
-
-            foreach (RaycastHit hit in _lastInteractionHits)
-            {
-                Collider collider = hit.collider;
-                Debug.Log($"[PointAndClick] Hit: '{collider.name}' | layer={LayerMask.LayerToName(collider.gameObject.layer)} ({collider.gameObject.layer}) | distance={hit.distance:F3} | zone={collider.GetComponentInParent<ClickableZone>() != null} | cameraPoint={collider.GetComponentInParent<CameraClickPoint>() != null}");
-            }
-        }
-
         // =======================================================================
         // Click
         // =======================================================================
@@ -316,8 +293,6 @@ namespace Core.Player
         private void UpdateClick()
         {
             if (!IsClickPressed()) return;
-            LogLastRaycast();
-            Debug.Log($"[PointAndClick] Clic détecté. Zone = {(_hoveredZone != null ? _hoveredZone.name : "NULL")}, CameraPoint = {(_hoveredCameraPoint != null ? _hoveredCameraPoint.name : "NULL")}");
             if (_hoveredCameraPoint != null)
             {
                 _currentTarget = null;
@@ -336,9 +311,6 @@ namespace Core.Player
 
         private void StartTravelToCurrentTarget()
         {
-            string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
-            Debug.Log($"[PointAndClick] Cible: '{targetName}' (targetPos: {_targetPosition})");
-
             SafeSetStopped(true);
             if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
                 _navMeshAgent.SetDestination(_targetPosition);
@@ -347,14 +319,12 @@ namespace Core.Player
             {
                 _state = State.Looking;
                 _lookTimer = 0f;
-                Debug.Log($"[PointAndClick] Phase LOOK avant marche ({lookDuration}s)");
             }
             else
             {
                 SafeSetStopped(false);
                 _state = State.Walking;
                 _isMoving = true;
-                Debug.Log($"[PointAndClick] Démarrage direct WALK");
             }
         }
 
@@ -386,8 +356,6 @@ namespace Core.Player
                 SafeSetStopped(false);
                 _state = State.Walking;
                 _isMoving = true;
-                string targetName = _currentCameraPoint != null ? _currentCameraPoint.name : _currentTarget.name;
-                Debug.Log($"[PointAndClick] Look terminé, marche vers '{targetName}'");
             }
         }
 
@@ -399,7 +367,6 @@ namespace Core.Player
         {
             if (_currentTarget == null && _currentCameraPoint == null)
             {
-                Debug.Log("[PointAndClick] UpdateMovement: cible null, retour à Idle.");
                 StopNavigation();
                 return;
             }
@@ -412,19 +379,10 @@ namespace Core.Player
                 return;
             }
 
-            // Log périodique
-            if (Time.time > _debugNextLogTime)
-            {
-                _debugNextLogTime = Time.time + 0.5f;
-                float remaining = _navMeshAgent.hasPath ? _navMeshAgent.remainingDistance : float.MaxValue;
-                Debug.Log($"[PointAndClick] remainingDistance: {remaining:F2} (stoppingDistance: {_navMeshAgent.stoppingDistance})");
-            }
-
             // Arrivée ?
             if (!_navMeshAgent.pathPending && _navMeshAgent.hasPath &&
                 _navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
             {
-                Debug.Log($"[PointAndClick] ARRIVÉ ! remainingDistance={_navMeshAgent.remainingDistance:F2}");
                 OnArrived();
                 return;
             }
@@ -458,7 +416,6 @@ namespace Core.Player
             {
                 _controller.transform.rotation = _alignViewToRotation;
                 _state = State.Idle;
-                Debug.Log("[PointAndClick] Alignement vue terminé.");
             }
         }
 
@@ -482,7 +439,6 @@ namespace Core.Player
         /// <summary>Arrivée même si le path est invalide (fallback sans rien appliquer).</summary>
         private void OnArrivedFallback()
         {
-            Debug.Log("[PointAndClick] Arrivée fallback (path invalide ou autre).");
             StopNavigation();
         }
 
@@ -496,8 +452,6 @@ namespace Core.Player
 
             if (_currentCameraPoint != null)
             {
-                Debug.Log($"[PointAndClick] Arrivé au point caméra '{_currentCameraPoint.name}'");
-
                 // Active le Place immédiatement (objets à activer/désactiver)
                 _currentCameraPoint.SelectPlace();
 
@@ -509,25 +463,13 @@ namespace Core.Player
                 _alignViewDuration = lookAtDuration;
                 _state = State.AligningView;
 
-                Debug.Log($"[PointAndClick] Début alignement vue ({_alignViewDuration}s)");
                 _currentCameraPoint = null;
                 return;
             }
 
-            Debug.Log($"[PointAndClick] Arrivé à la zone '{_currentTarget.name}'");
-
             // Orienter la caméra vers la cible de regard
-            if (_currentTarget.LookAtTarget == null)
+            if (_currentTarget.LookAtTarget != null && _methilCamera != null)
             {
-                Debug.LogWarning($"[PointAndClick] LookAtTarget est null sur '{_currentTarget.name}'.");
-            }
-            else if (_methilCamera == null)
-            {
-                Debug.LogWarning($"[PointAndClick] MethilCamera introuvable.");
-            }
-            else
-            {
-                Debug.Log($"[PointAndClick] LookAtSmooth → '{_currentTarget.LookAtTarget.name}' ({lookAtDuration}s)");
                 _methilCamera.LookAtSmooth(_currentTarget.LookAtTarget.gameObject, lookAtDuration);
             }
 

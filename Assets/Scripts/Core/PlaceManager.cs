@@ -160,7 +160,7 @@ namespace Core
             _state = State.Walking;
             RefreshButtons();
             _onNavigationStarted?.Invoke();
-            Debug.Log($"[PlaceManager] Navigation vers '{_targetPlace.name}' (pos: {destination})");
+            Debug.Log($"[PlaceManager] Navigation vers '{_targetPlace.name}' — boutons désactivés pendant la marche (pos: {destination})");
         }
 
         // =======================================================================
@@ -227,10 +227,13 @@ namespace Core
             _state = State.AligningView;
 
             // Active le décor immédiatement
+            Place previousPlace = _currentPlace;
             _currentPlace = _targetPlace;
             _circusManager?.SelectPlace(_currentPlace);
             _onPlaceChanged?.Invoke(_currentPlace);
             RefreshButtons();
+
+            Debug.Log($"[PlaceManager] Place changé : '{previousPlace?.name}' → '{_currentPlace.name}'");
 
             Debug.Log($"[PlaceManager] Alignement vue ({_lookAtDuration}s) vers '{_currentPlace.name}'");
         }
@@ -276,6 +279,12 @@ namespace Core
             SetButtonInteractable(_backButton, CanGoBack);
             SetButtonInteractable(_leftButton, CanGoLeft);
             SetButtonInteractable(_rightButton, CanGoRight);
+
+            Debug.Log($"[PlaceManager] Boutons mis à jour — " +
+                $"Front={(CanGoFront ? (FrontPlace != null ? FrontPlace.name : "?") : "X")} " +
+                $"Back={(CanGoBack ? (BackPlace != null ? BackPlace.name : "?") : "X")} " +
+                $"Left={(CanGoLeft ? (LeftPlace != null ? LeftPlace.name : "?") : "X")} " +
+                $"Right={(CanGoRight ? (RightPlace != null ? RightPlace.name : "?") : "X")}");
         }
 
         private static void SetButtonInteractable(Button button, bool interactable)
