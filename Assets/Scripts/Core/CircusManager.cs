@@ -42,25 +42,21 @@ namespace Core
             }
         }
 
-        [ContextMenu("Add All Places From Scene")]
-        private void AddAllPlacesFromScene()
+        [ContextMenu("Rebuild All Places From Scene")]
+        private void RebuildAllPlacesFromScene()
         {
             Place[] allPlaces = FindObjectsByType<Place>(
                 FindObjectsInactive.Include,
                 FindObjectsSortMode.None
             );
 
-            int added = 0;
-            foreach (Place place in allPlaces)
-            {
-                if (!_places.Contains(place))
-                {
-                    _places.Add(place);
-                    added++;
-                }
-            }
+            System.Array.Sort(allPlaces, (a, b) =>
+                string.CompareOrdinal(a.name, b.name));
 
-            Debug.Log($"[CircusManager] {added} Place(s) ajouté(s) à la liste ({_places.Count} total).");
+            _places.Clear();
+            _places.AddRange(allPlaces);
+
+            Debug.Log($"[CircusManager] Liste reconstruite : {_places.Count} Place(s) trié(s) par nom.");
         }
     }
 }
