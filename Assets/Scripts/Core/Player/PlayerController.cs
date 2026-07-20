@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace Core.Player
 {
-    [RequireComponent(typeof(CharacterController))]
     public class PlayerController : UpdatableController<PlayerController>
     {
         [Header("References")]
