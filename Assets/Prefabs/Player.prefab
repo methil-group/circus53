@@ -10,12 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 8540939302309967218}
   - component: {fileID: 8019099049947451763}
-  - component: {fileID: 5508541213347923000}
-  - component: {fileID: 3185138450345958170}
   - component: {fileID: 6614508684796717535}
   - component: {fileID: 9125666452494350179}
   - component: {fileID: 8062859888895409381}
   - component: {fileID: 6400190547354399910}
+  - component: {fileID: 2243361246510941865}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -47,54 +46,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1128520970000001633}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!136 &5508541213347923000
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1128520970000001633}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.3
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!143 &3185138450345958170
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1128520970000001633}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.3
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6614508684796717535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,6 +73,7 @@ MonoBehaviour:
         canMove: 1
         speed: 4
         arrivalThreshold: 1.5
+        acceleration: 100
         lookBeforeWalk: 1
         lookDuration: 0.4
         rotationSpeed: 360
@@ -155,8 +107,6 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
         _bobSmoothSpeed: 8
-        stuckTimeout: 1.5
-        stuckDistanceDelta: 0.05
         pointAction: {fileID: 0}
         clickAction: {fileID: 0}
         defaultCursor: {fileID: 0}
@@ -304,7 +254,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 1.0533051
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -380,6 +330,28 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!195 &2243361246510941865
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128520970000001633}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &4188318856897736285
 GameObject:
   m_ObjectHideFlags: 0
@@ -531,7 +503,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Framework.Camera.MethilCamera
   _preset: 1
-  _customRatio: 0.96
+  _customRatio: 1
   _barColor: {r: 0, g: 0, b: 0, a: 1}
   _smoothCurve:
     serializedVersion: 2
@@ -557,6 +529,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _humanLookDuration: 1.5
+  _humanLookOvershoot: 0.05
+  _humanLookMinDelay: 0.1
+  _humanLookMaxDelay: 0.2
 --- !u!1 &7187381331913404459
 GameObject:
   m_ObjectHideFlags: 0
