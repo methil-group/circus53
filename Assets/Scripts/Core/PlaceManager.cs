@@ -87,7 +87,10 @@ namespace Core
                 _navMeshAgent = FindAnyObjectByType<NavMeshAgent>();
 
             if (_navMeshAgent != null)
+            {
                 _navMeshAgent.speed = _speed;
+                Debug.Log($"[PlaceManager] NavMeshAgent speed = {_speed}");
+            }
 
             if (_circusManager == null)
                 _circusManager = FindAnyObjectByType<CircusManager>();
