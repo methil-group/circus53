@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Core
@@ -266,11 +267,40 @@ namespace Core
         // UI Buttons
         // =======================================================================
 
-        private static void WireButton(Button button, UnityEngine.Events.UnityAction action)
+        private void WireButton(Button button, UnityEngine.Events.UnityAction action)
         {
             if (button == null) return;
+
+            // Branchement onClick
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(action);
+
+            // Rendu invisible
+            Graphic graphic = button.targetGraphic;
+            if (graphic != null)
+            {
+                Color c = graphic.color;
+                c.a = 0f;
+                graphic.color = c;
+            }
+
+            // Cacher tous les enfants par défaut
+            SetFirstChildVisible(button, false);
+
+            // Hover : afficher le premier enfant si interactable
+            EventTrigger trigger = button.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null)
+                trigger = button.gameObject.AddComponent<EventTrigger>();
+
+            trigger.triggers.Clear();
+
+            EventTrigger.Entry enter = new() { eventID = EventTriggerType.PointerEnter };
+            enter.callback.AddListener(_ => OnButtonHover(button, true));
+            trigger.triggers.Add(enter);
+
+            EventTrigger.Entry exit = new() { eventID = EventTriggerType.PointerExit };
+            exit.callback.AddListener(_ => OnButtonHover(button, false));
+            trigger.triggers.Add(exit);
         }
 
         private void RefreshButtons()
@@ -287,10 +317,28 @@ namespace Core
                 $"Right={(CanGoRight ? (RightPlace != null ? RightPlace.name : "?") : "X")}");
         }
 
-        private static void SetButtonInteractable(Button button, bool interactable)
+        private void SetButtonInteractable(Button button, bool interactable)
         {
-            if (button != null)
-                button.interactable = interactable;
+            if (button == null) return;
+            button.interactable = interactable;
+
+            // Si désactivé, cacher l'enfant immédiatement
+            if (!interactable)
+                SetFirstChildVisible(button, false);
+        }
+
+        private void OnButtonHover(Button button, bool hover)
+        {
+            if (button == null) return;
+            SetFirstChildVisible(button, hover && button.interactable);
+        }
+
+        private static void SetFirstChildVisible(Button button, bool visible)
+        {
+            if (button == null || button.transform.childCount == 0) return;
+            Transform firstChild = button.transform.GetChild(0);
+            if (firstChild != null)
+                firstChild.gameObject.SetActive(visible);
         }
 
         // =======================================================================
