@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Core
 {
@@ -20,6 +21,12 @@ namespace Core
         [SerializeField] private CircusManager _circusManager;
         [SerializeField] private Place _startingPlace;
         [SerializeField] private NavMeshAgent _navMeshAgent;
+
+        [Header("UI Buttons")]
+        [SerializeField] private Button _frontButton;
+        [SerializeField] private Button _backButton;
+        [SerializeField] private Button _leftButton;
+        [SerializeField] private Button _rightButton;
 
         [Header("Navigation")]
         [SerializeField] private float _arrivalThreshold = 1.5f;
@@ -77,6 +84,12 @@ namespace Core
 
             if (_circusManager == null)
                 _circusManager = FindAnyObjectByType<CircusManager>();
+
+            // Branchement automatique des boutons UI
+            WireButton(_frontButton, GoFront);
+            WireButton(_backButton, GoBack);
+            WireButton(_leftButton, GoLeft);
+            WireButton(_rightButton, GoRight);
         }
 
         private void Start()
@@ -88,6 +101,8 @@ namespace Core
                 _onPlaceChanged?.Invoke(_currentPlace);
                 Debug.Log($"[PlaceManager] Place de départ : '{_currentPlace.name}'");
             }
+
+            RefreshButtons();
         }
 
         private void Update()
@@ -143,6 +158,7 @@ namespace Core
             }
 
             _state = State.Walking;
+            RefreshButtons();
             _onNavigationStarted?.Invoke();
             Debug.Log($"[PlaceManager] Navigation vers '{_targetPlace.name}' (pos: {destination})");
         }
@@ -214,6 +230,7 @@ namespace Core
             _currentPlace = _targetPlace;
             _circusManager?.SelectPlace(_currentPlace);
             _onPlaceChanged?.Invoke(_currentPlace);
+            RefreshButtons();
 
             Debug.Log($"[PlaceManager] Alignement vue ({_lookAtDuration}s) vers '{_currentPlace.name}'");
         }
@@ -238,6 +255,33 @@ namespace Core
                 _onNavigationComplete?.Invoke();
                 Debug.Log("[PlaceManager] Navigation terminée.");
             }
+        }
+
+        // =======================================================================
+
+        // =======================================================================
+        // UI Buttons
+        // =======================================================================
+
+        private static void WireButton(Button button, UnityEngine.Events.UnityAction action)
+        {
+            if (button == null) return;
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(action);
+        }
+
+        private void RefreshButtons()
+        {
+            SetButtonInteractable(_frontButton, CanGoFront);
+            SetButtonInteractable(_backButton, CanGoBack);
+            SetButtonInteractable(_leftButton, CanGoLeft);
+            SetButtonInteractable(_rightButton, CanGoRight);
+        }
+
+        private static void SetButtonInteractable(Button button, bool interactable)
+        {
+            if (button != null)
+                button.interactable = interactable;
         }
 
         // =======================================================================
