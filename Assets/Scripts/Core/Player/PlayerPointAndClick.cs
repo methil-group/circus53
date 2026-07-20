@@ -137,7 +137,17 @@ namespace Core.Player
             }
             else
             {
-                Debug.LogWarning("[PointAndClick] NavMeshAgent pas sur un NavMesh au Start. Le joueur doit être placé sur une surface navigable.");
+                // Le joueur n'est pas sur le NavMesh — on cherche le point le plus proche
+                if (NavMesh.SamplePosition(controller.transform.position, out NavMeshHit hit, 100f, NavMesh.AllAreas))
+                {
+                    _navMeshAgent.Warp(hit.position);
+                    _navMeshAgent.isStopped = true;
+                    Debug.Log($"[PointAndClick] Agent warpé au NavMesh le plus proche : {hit.position}");
+                }
+                else
+                {
+                    Debug.LogError("[PointAndClick] Aucun NavMesh dans un rayon de 100 unités ! Il faut baker un NavMesh (Window > AI > Navigation > Bake).");
+                }
             }
 
             if (_cameraTransform != null)
