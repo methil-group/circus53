@@ -323,7 +323,16 @@ namespace Core
             if (button == null || button.transform.childCount == 0) return;
             Transform firstChild = button.transform.GetChild(0);
             if (firstChild != null)
+            {
                 firstChild.gameObject.SetActive(visible);
+
+                // Désactiver le Raycast Target sur les Graphic des enfants
+                // pour ne pas interférer avec le hover du Button parent
+                foreach (Graphic graphic in firstChild.GetComponentsInChildren<Graphic>(includeInactive: true))
+                {
+                    graphic.raycastTarget = false;
+                }
+            }
         }
 
         // =======================================================================
