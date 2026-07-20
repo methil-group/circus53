@@ -217,6 +217,25 @@ namespace Core
             Debug.Log($"[PlaceManager] Navigation vers '{_targetPlace.name}' — boutons désactivés pendant la marche (pos: {destination})");
         }
 
+        [ContextMenu("Snap To Current Place")]
+        private void SnapToCurrentPlace()
+        {
+            if (_currentPlace == null)
+            {
+                Debug.LogWarning("[PlaceManager] Pas de Place courant.");
+                return;
+            }
+
+            if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh)
+            {
+                _navMeshAgent.Warp(_currentPlace.TargetPosition);
+                _navMeshAgent.transform.rotation = _currentPlace.LookRotation;
+            }
+
+            Debug.Log($"[PlaceManager] Snap vers '{_currentPlace.name}' " +
+                $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
+        }
+
         // =======================================================================
         // Walking
         // =======================================================================
