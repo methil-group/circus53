@@ -44,12 +44,18 @@ namespace Core
         {
             if (player == null || player.CameraTransform == null) return Quaternion.identity;
 
+            Quaternion targetRotation = GetViewRotation();
+            Transform playerCamera = player.CameraTransform;
+            return targetRotation * Quaternion.Inverse(playerCamera.rotation);
+        }
+
+        /// <summary>Retourne la rotation world cible du cadrage (flipForward appliqué).</summary>
+        public Quaternion GetViewRotation()
+        {
             Quaternion targetRotation = transform.rotation;
             if (_flipForward)
                 targetRotation *= Quaternion.Euler(0f, 180f, 0f);
-
-            Transform playerCamera = player.CameraTransform;
-            return targetRotation * Quaternion.Inverse(playerCamera.rotation);
+            return targetRotation;
         }
 
         /// <summary>Applique le cadrage instantanément (téléportation, conservé pour compatibilité).</summary>
