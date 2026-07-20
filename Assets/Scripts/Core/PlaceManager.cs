@@ -280,11 +280,6 @@ namespace Core
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(action);
 
-            // Désactiver l'Image native du bouton
-            Graphic nativeGraphic = button.targetGraphic;
-            if (nativeGraphic != null)
-                nativeGraphic.enabled = false;
-
             // Forcer la transition couleur sur le bouton
             button.transition = Selectable.Transition.ColorTint;
             button.navigation = new Navigation { mode = Navigation.Mode.None };
