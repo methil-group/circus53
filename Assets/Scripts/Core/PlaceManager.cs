@@ -310,11 +310,8 @@ namespace Core
             if (button == null) return;
             button.interactable = interactable;
 
-            // Activer l'Image et le premier enfant seulement si interactable
-            Graphic graphic = button.targetGraphic;
-            if (graphic != null)
-                graphic.enabled = interactable;
-
+            // L'Image du bouton reste TOUJOURS désactivée
+            // Seul le premier enfant s'affiche/masque
             SetFirstChildVisible(button, interactable);
         }
 
