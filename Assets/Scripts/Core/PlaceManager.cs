@@ -31,9 +31,18 @@ namespace Core
 
         [Header("Navigation")]
         [SerializeField] private float _speed = 10f;
+        [SerializeField] private float _acceleration = 200f;
         [SerializeField] private float _arrivalThreshold = 1.5f;
         [SerializeField] private float _lookAtDuration = 0.8f;
         [SerializeField] private float _rotationSpeed = 360f;
+
+        [Header("Head Bob")]
+        [SerializeField] private bool _enableHeadBob = true;
+        [SerializeField, Tooltip("Transform qui reçoit le bob (ex: CameraHolder). Si null, cherche automatiquement.")]
+        private Transform _headBobTarget;
+        [SerializeField] private float _bobAmount = 0.08f;
+        [SerializeField] private float _bobFrequency = 5f;
+        [SerializeField] private float _bobSmoothSpeed = 10f;
 
         [Header("Events")]
         [SerializeField] private UnityEvent<Place> _onPlaceChanged;
@@ -49,6 +58,11 @@ namespace Core
         private Quaternion _alignFromRotation;
         private Quaternion _alignToRotation;
         private float _debugNextLogTime;
+
+        // Head bob
+        private float _bobPhase;
+        private Vector3 _defaultBobPosition;
+        private bool _hasDefaultBobPos;
 
         /// <summary>Place actuel du joueur.</summary>
         public Place CurrentPlace => _currentPlace;
@@ -89,7 +103,8 @@ namespace Core
             if (_navMeshAgent != null)
             {
                 _navMeshAgent.speed = _speed;
-                Debug.Log($"[PlaceManager] NavMeshAgent speed = {_speed}");
+                _navMeshAgent.acceleration = _acceleration;
+                Debug.Log($"[PlaceManager] NavMeshAgent speed={_speed}, acceleration={_acceleration}");
             }
 
             if (_circusManager == null)
@@ -104,6 +119,23 @@ namespace Core
 
         private void Start()
         {
+            // Init head bob
+            if (_enableHeadBob)
+            {
+                if (_headBobTarget == null)
+                {
+                    Camera mainCam = Camera.main;
+                    if (mainCam != null)
+                        _headBobTarget = mainCam.transform.parent; // CameraHolder
+                }
+
+                if (_headBobTarget != null)
+                {
+                    _defaultBobPosition = _headBobTarget.localPosition;
+                    _hasDefaultBobPos = true;
+                }
+            }
+
             if (_startingPlace != null && _currentPlace == null)
             {
                 _currentPlace = _startingPlace;
@@ -132,6 +164,8 @@ namespace Core
                     UpdateAligningView(dt);
                     break;
             }
+
+            UpdateHeadBob(dt);
         }
 
         // =======================================================================
@@ -377,6 +411,35 @@ namespace Core
             Graphic graphic = button?.targetGraphic;
             if (graphic != null)
                 graphic.enabled = enabled;
+        }
+
+        // =======================================================================
+
+        // =======================================================================
+        // Head Bob
+        // =======================================================================
+
+        private void UpdateHeadBob(float dt)
+        {
+            if (!_enableHeadBob || _headBobTarget == null || !_hasDefaultBobPos) return;
+
+            Vector3 targetBob = Vector3.zero;
+
+            if (_state == State.Walking && _navMeshAgent != null && _navMeshAgent.velocity.sqrMagnitude > 0.01f)
+            {
+                _bobPhase += _speed * _bobFrequency * dt;
+                float phase = _bobPhase % (Mathf.PI * 2f);
+                float vertical = Mathf.Sin(phase) * _bobAmount;
+                float horizontal = Mathf.Cos(phase * 1.7f) * _bobAmount * 0.5f;
+
+                targetBob = new Vector3(horizontal, vertical, 0f);
+            }
+
+            _headBobTarget.localPosition = Vector3.Lerp(
+                _headBobTarget.localPosition,
+                _defaultBobPosition + targetBob,
+                _bobSmoothSpeed * dt
+            );
         }
 
         // =======================================================================
