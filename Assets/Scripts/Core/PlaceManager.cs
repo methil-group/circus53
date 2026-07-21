@@ -246,7 +246,12 @@ namespace Core
             if (_navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
             {
                 _navMeshAgent.isStopped = false;
-                _navMeshAgent.SetDestination(destination);
+                bool ok = _navMeshAgent.SetDestination(destination);
+                Debug.Log($"[PlaceManager] SetDestination({destination}) -> {(ok ? "OK" : "FAIL")}, isOnNavMesh={_navMeshAgent.isOnNavMesh}");
+            }
+            else
+            {
+                Debug.LogWarning($"[PlaceManager] Agent pas sur le NavMesh ! isOnNavMesh={_navMeshAgent.isOnNavMesh}, isActiveAndEnabled={_navMeshAgent.isActiveAndEnabled}");
             }
 
             _state = State.Walking;
@@ -296,31 +301,21 @@ namespace Core
                 return;
             }
 
-            // Chemin invalide ou partiel (destination inatteignable) ?
-            if (_navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid ||
-                _navMeshAgent.pathStatus == NavMeshPathStatus.PathPartial)
+            // Chemin invalide ?
+            if (_navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
             {
-                Debug.LogWarning($"[PlaceManager] Chemin invalide/partiel vers '{_targetPlace.name}' — abandon.");
+                Debug.LogWarning($"[PlaceManager] Chemin invalide vers '{_targetPlace.name}' — abandon.");
                 StopNavigation();
                 return;
             }
 
-            // Pas encore de path calculé
+            // Pas encore calculé ou pas de path
             if (_navMeshAgent.pathPending)
                 return;
 
-            // Agent n'a pas de path du tout
             if (!_navMeshAgent.hasPath)
             {
                 Debug.LogWarning($"[PlaceManager] Pas de path vers '{_targetPlace.name}' — abandon.");
-                StopNavigation();
-                return;
-            }
-
-            // remainingDistance invalide
-            if (_navMeshAgent.remainingDistance >= float.MaxValue * 0.5f)
-            {
-                Debug.LogWarning($"[PlaceManager] remainingDistance infinie vers '{_targetPlace.name}' — abandon.");
                 StopNavigation();
                 return;
             }
