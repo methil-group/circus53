@@ -8,22 +8,22 @@ Shader "Custom/URPTerrainHeightBlend"
         _BlendHeight2 ("Layer 2 Max Height (Y)", Float) = 15.0
         _BlendSmooth  ("Blend Smoothness", Range(0.0, 5.0)) = 1.0
 
-        [Header(Layer 0 — Bottom)]
+        [Header(Layer 0 - Bottom)]
         [MainTexture] _Layer0 ("Texture", 2D) = "white" {}
         _Layer0Normal ("Normal", 2D) = "bump" {}
         _Layer0Scale ("Tiling", Float) = 10.0
 
-        [Header(Layer 1 — Low-Mid)]
+        [Header(Layer 1 - Low-Mid)]
         _Layer1 ("Texture", 2D) = "white" {}
         _Layer1Normal ("Normal", 2D) = "bump" {}
         _Layer1Scale ("Tiling", Float) = 10.0
 
-        [Header(Layer 2 — Mid-High)]
+        [Header(Layer 2 - Mid-High)]
         _Layer2 ("Texture", 2D) = "white" {}
         _Layer2Normal ("Normal", 2D) = "bump" {}
         _Layer2Scale ("Tiling", Float) = 10.0
 
-        [Header(Layer 3 — Top)]
+        [Header(Layer 3 - Top)]
         _Layer3 ("Texture", 2D) = "white" {}
         _Layer3Normal ("Normal", 2D) = "bump" {}
         _Layer3Scale ("Tiling", Float) = 10.0
