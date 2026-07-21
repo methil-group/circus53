@@ -74,6 +74,7 @@ namespace Core
         [SerializeField] private UnityEvent<Place> _onPlaceChanged;
         [SerializeField] private UnityEvent _onNavigationStarted;
         [SerializeField] private UnityEvent _onNavigationComplete;
+        [SerializeField] private UnityEvent<string> _onDialog; // texte du dialogue
 
         // =======================================================================
 
@@ -118,6 +119,7 @@ namespace Core
         public UnityEvent<Place> OnPlaceChanged => _onPlaceChanged;
         public UnityEvent OnNavigationStarted => _onNavigationStarted;
         public UnityEvent OnNavigationComplete => _onNavigationComplete;
+        public UnityEvent<string> OnDialog => _onDialog;
 
         // =======================================================================
 
@@ -441,6 +443,9 @@ namespace Core
             _onPlaceChanged?.Invoke(_currentPlace);
             RefreshButtons();
 
+            // Jouer les dialogues OnArrival de ce Place (une seule fois chacun)
+            PlayOnArrivalDialogues(_currentPlace);
+
             // Init trackers pour le live sync
             _lastPlacePosition = _currentPlace.TargetPosition;
             _lastPlaceRotation = _currentPlace.LookRotation;
@@ -522,6 +527,26 @@ namespace Core
         private static float SmoothStep(float t)
         {
             return t * t * (3f - 2f * t);
+        }
+
+        // =======================================================================
+        // Dialogues
+        // =======================================================================
+
+        private void PlayOnArrivalDialogues(Place place)
+        {
+            if (place == null || place.Dialogues == null) return;
+
+            foreach (DialogLine line in place.Dialogues)
+            {
+                if (line.Trigger != DialogTrigger.OnArrival) continue;
+                if (line.HasPlayed) continue;
+                if (string.IsNullOrWhiteSpace(line.Text)) continue;
+
+                line.HasPlayed = true;
+                _onDialog?.Invoke(line.Text);
+                Debug.Log($"[PlaceManager] Dialogue OnArrival : \"{line.Text}\"");
+            }
         }
 
         // =======================================================================

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Core
@@ -17,10 +18,14 @@ namespace Core
         [SerializeField, Tooltip("Direction dans laquelle le joueur regarde quand il est sur ce Place.")]
         private Vector3 _lookDirection = Vector3.forward;
 
+        [Header("Dialogues")]
+        [SerializeField] private DialogLine[] _dialogues = Array.Empty<DialogLine>();
+
         public Place FrontPlace => _frontPlace;
         public Place BackPlace => _backPlace;
         public Place LeftPlace => _leftPlace;
         public Place RightPlace => _rightPlace;
+        public DialogLine[] Dialogues => _dialogues;
 
         /// <summary>Position cible pour le joueur (venant du CameraClickPoint).</summary>
         public Vector3 TargetPosition => transform.position;
