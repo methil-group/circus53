@@ -243,15 +243,21 @@ namespace Core
             _targetPlace = target;
 
             Vector3 destination = _targetPlace.TargetPosition;
-            if (_navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
+
+            if (_navMeshAgent == null || !_navMeshAgent.isOnNavMesh || !_navMeshAgent.isActiveAndEnabled)
             {
-                _navMeshAgent.isStopped = false;
-                bool ok = _navMeshAgent.SetDestination(destination);
-                Debug.Log($"[PlaceManager] SetDestination({destination}) -> {(ok ? "OK" : "FAIL")}, isOnNavMesh={_navMeshAgent.isOnNavMesh}");
+                Debug.LogError($"[PlaceManager] NavMeshAgent invalide : agent={_navMeshAgent != null}, onNavMesh={_navMeshAgent?.isOnNavMesh}, active={_navMeshAgent?.isActiveAndEnabled}");
+                return;
             }
-            else
+
+            _navMeshAgent.isStopped = false;
+            bool ok = _navMeshAgent.SetDestination(destination);
+
+            if (!ok)
             {
-                Debug.LogWarning($"[PlaceManager] Agent pas sur le NavMesh ! isOnNavMesh={_navMeshAgent.isOnNavMesh}, isActiveAndEnabled={_navMeshAgent.isActiveAndEnabled}");
+                Debug.LogWarning($"[PlaceManager] SetDestination FAIL pour '{target.name}' à {destination} — vérifie que la position est sur le NavMesh.");
+                _navMeshAgent.isStopped = true;
+                return;
             }
 
             _state = State.Walking;
