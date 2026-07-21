@@ -392,7 +392,7 @@ namespace Core
                 return;
             }
 
-            float t = activeTime / activeDuration;
+            float t = Mathf.Clamp01(activeTime / activeDuration);
             float humanT = HumanLookCurve(t);
 
             // Rotation principale (Y) avec overshoot
