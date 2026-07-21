@@ -253,14 +253,32 @@ namespace Core
             _navMeshAgent.isStopped = false;
             bool ok = _navMeshAgent.SetDestination(destination);
 
-            // Debug : vérifier si la destination est vraiment sur le NavMesh
-            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            // Dump complet du NavMeshAgent
+            Debug.Log($"[PlaceManager] NAVMESH DUMP: " +
+                $"agentTypeID={_navMeshAgent.agentTypeID} " +
+                $"areaMask={_navMeshAgent.areaMask} " +
+                $"radius={_navMeshAgent.radius} height={_navMeshAgent.height} " +
+                $"baseOffset={_navMeshAgent.baseOffset} " +
+                $"walkableMask={NavMesh.GetAreaFromName("Walkable")} " +
+                $"destination={destination} " +
+                $"onNavMesh={_navMeshAgent.isOnNavMesh} " +
+                $"SetDestination={ok}");
+
+            // Dump du path après SetDestination
+            NavMeshPath path = new NavMeshPath();
+            if (NavMesh.CalculatePath(_navMeshAgent.transform.position, destination, _navMeshAgent.areaMask, path))
             {
-                Debug.Log($"[PlaceManager] Destination NavMesh sample OK : {hit.position} (distance={hit.distance:F3})");
+                Debug.Log($"[PlaceManager] NavMesh.CalculatePath OK: status={path.status} corners={string.Join(", ", System.Array.ConvertAll(path.corners, c => c.ToString()))}");
             }
             else
             {
-                Debug.LogWarning($"[PlaceManager] Destination PAS sur le NavMesh ! pos={destination}");
+                Debug.LogWarning($"[PlaceManager] NavMesh.CalculatePath FAILED: status={path.status}");
+            }
+
+            // Vérifier quel area est à la destination
+            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            {
+                Debug.Log($"[PlaceManager] Dest sample: pos={hit.position} area={hit.mask} distance={hit.distance:F3}");
             }
 
             if (!ok)
