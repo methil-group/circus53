@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 using VolFx;
 
 namespace Core
@@ -33,7 +34,9 @@ namespace Core
         [SerializeField, Tooltip("Impact maximum du dither (à 100 d'anxiété).")]
         [Range(0f, 1f)] private float _ditherImpactMax = 0.8f;
 
-        [Header("Events")]
+        [Header("Debug")]
+        [SerializeField, Tooltip("Slider UI optionnel pour visualiser l'anxiété en temps réel.")]
+        private Slider _debugSlider;
         [SerializeField] private UnityEvent<float> _onAnxietyChanged;
         [SerializeField] private UnityEvent _onHighAnxiety;
         [SerializeField] private UnityEvent _onCriticalAnxiety;
@@ -192,10 +195,13 @@ namespace Core
 
         private void UpdateDither()
         {
-            if (_ditherVol == null) return;
-
             float t = NormalizedAnxiety;
-            _ditherVol.m_Impact.value = Mathf.Lerp(_ditherImpactMin, _ditherImpactMax, t);
+
+            if (_ditherVol != null)
+                _ditherVol.m_Impact.value = Mathf.Lerp(_ditherImpactMin, _ditherImpactMax, t);
+
+            if (_debugSlider != null)
+                _debugSlider.value = t;
         }
     }
 }
