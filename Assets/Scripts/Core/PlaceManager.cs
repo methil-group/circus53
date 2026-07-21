@@ -86,7 +86,6 @@ namespace Core
         private Quaternion _alignToRotation;
         private float _alignWobbleX;
         private float _alignWobbleZ;
-        private float _debugNextLogTime;
 
         // Live editor sync
         private Vector3 _lastPlacePosition;
@@ -297,18 +296,31 @@ namespace Core
                 return;
             }
 
-            // Log périodique
-            if (Time.time > _debugNextLogTime)
+            // Chemin invalide ou partiel (destination inatteignable) ?
+            if (_navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid ||
+                _navMeshAgent.pathStatus == NavMeshPathStatus.PathPartial)
             {
-                _debugNextLogTime = Time.time + 0.5f;
-                float remaining = _navMeshAgent.hasPath ? _navMeshAgent.remainingDistance : float.MaxValue;
-                Debug.Log($"[PlaceManager] remainingDistance: {remaining:F2} (seuil: {_arrivalThreshold})");
+                Debug.LogWarning($"[PlaceManager] Chemin invalide/partiel vers '{_targetPlace.name}' — abandon.");
+                StopNavigation();
+                return;
             }
 
-            // Chemin invalide ?
-            if (_navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
+            // Pas encore de path calculé
+            if (_navMeshAgent.pathPending)
+                return;
+
+            // Agent n'a pas de path du tout
+            if (!_navMeshAgent.hasPath)
             {
-                Debug.LogWarning($"[PlaceManager] Chemin invalide vers '{_targetPlace.name}' — abandon.");
+                Debug.LogWarning($"[PlaceManager] Pas de path vers '{_targetPlace.name}' — abandon.");
+                StopNavigation();
+                return;
+            }
+
+            // remainingDistance invalide
+            if (_navMeshAgent.remainingDistance >= float.MaxValue * 0.5f)
+            {
+                Debug.LogWarning($"[PlaceManager] remainingDistance infinie vers '{_targetPlace.name}' — abandon.");
                 StopNavigation();
                 return;
             }
