@@ -27,8 +27,7 @@ namespace Core
             }
             Instance = this;
 
-            if (_text != null)
-                _text.gameObject.SetActive(false);
+            Clear();
         }
 
         public void Show(string message)
@@ -50,15 +49,22 @@ namespace Core
         {
             if (_hideRoutine != null)
                 StopCoroutine(_hideRoutine);
+            Clear();
+        }
+
+        private void Clear()
+        {
             if (_text != null)
+            {
+                _text.text = string.Empty;
                 _text.gameObject.SetActive(false);
+            }
         }
 
         private IEnumerator HideAfter(float delay)
         {
             yield return new WaitForSeconds(delay);
-            if (_text != null)
-                _text.gameObject.SetActive(false);
+            Clear();
         }
     }
 }
