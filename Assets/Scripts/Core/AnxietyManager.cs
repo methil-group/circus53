@@ -30,9 +30,11 @@ namespace Core
         [SerializeField, Tooltip("Volume global de la scène contenant le MethilDither.")]
         private Volume _globalVolume;
         [SerializeField, Tooltip("Impact minimum du dither (à 0 d'anxiété).")]
-        [Range(0f, 1f)] private float _ditherImpactMin;
+        [Range(0f, 1f)] private float _ditherImpactMin = 0.6f;
         [SerializeField, Tooltip("Impact maximum du dither (à 100 d'anxiété).")]
-        [Range(0f, 1f)] private float _ditherImpactMax = 0.8f;
+        [Range(0f, 1f)] private float _ditherImpactMax = 0.9f;
+        [SerializeField, Tooltip("Courbe de progression de l'impact (0→1 = anxiété 0→100). X=anxiété normalisée, Y=impact.")]
+        private AnimationCurve _ditherCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
 
         [Header("Debug")]
         [SerializeField, Tooltip("Slider UI optionnel pour visualiser l'anxiété en temps réel.")]
@@ -198,7 +200,10 @@ namespace Core
             float t = NormalizedAnxiety;
 
             if (_ditherVol != null)
-                _ditherVol.m_Impact.value = Mathf.Lerp(_ditherImpactMin, _ditherImpactMax, t);
+            {
+                float curvedT = _ditherCurve.Evaluate(t);
+                _ditherVol.m_Impact.value = Mathf.Lerp(_ditherImpactMin, _ditherImpactMax, curvedT);
+            }
 
             if (_debugSlider != null)
                 _debugSlider.value = t;
