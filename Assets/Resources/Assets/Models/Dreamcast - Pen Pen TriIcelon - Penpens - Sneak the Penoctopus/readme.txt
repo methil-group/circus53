@@ -1,0 +1,1 @@
+Rigging is primarily to preseve accesory and feet locations, flippers are controlled in-game with vertex animation.  Feet are not attached by default.
