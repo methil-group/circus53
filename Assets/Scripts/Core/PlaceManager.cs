@@ -86,6 +86,7 @@ namespace Core
         private Quaternion _alignToRotation;
         private float _alignWobbleX;
         private float _alignWobbleZ;
+        private bool _blockedByDialog;
 
         // Live editor sync
         private Vector3 _lastPlacePosition;
@@ -111,7 +112,7 @@ namespace Core
         public bool CanGoLeft => LeftPlace != null;
         public bool CanGoRight => RightPlace != null;
 
-        public bool CanNavigate => _state == State.Idle;
+        public bool CanNavigate => _state == State.Idle && !_blockedByDialog;
 
         public bool IsNavigating => _state != State.Idle;
 
@@ -542,9 +543,32 @@ namespace Core
                 if (string.IsNullOrWhiteSpace(line.Text)) continue;
 
                 line.HasPlayed = true;
-                DialogDisplayer.Instance?.Show(line.Text);
+
+                if (line.BlockMovement)
+                {
+                    _blockedByDialog = true;
+                    RefreshButtons();
+                }
+
+                DialogDisplayer.Instance?.Play(line);
                 Debug.Log($"[PlaceManager] Dialogue OnArrival : \"{line.Text}\"");
+
+                // On ne joue qu'un seul dialogue à la fois
+                if (line.BlockMovement)
+                {
+                    DialogDisplayer.Instance.OnDialogComplete += OnDialogFinished;
+                }
+                break;
             }
+        }
+
+        private void OnDialogFinished()
+        {
+            if (DialogDisplayer.Instance != null)
+                DialogDisplayer.Instance.OnDialogComplete -= OnDialogFinished;
+
+            _blockedByDialog = false;
+            RefreshButtons();
         }
 
         // =======================================================================

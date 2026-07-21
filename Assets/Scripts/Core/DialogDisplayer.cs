@@ -1,22 +1,20 @@
 using TMPro;
 using UnityEngine;
 using System.Collections;
+using System;
 
 namespace Core
 {
-    /// <summary>
-    /// Affiche les dialogues en sous-titres sur un TMP_Text.
-    /// Singleton — PlaceManager l'appelle directement.
-    /// </summary>
     public class DialogDisplayer : MonoBehaviour
     {
         public static DialogDisplayer Instance { get; private set; }
 
         [SerializeField] private TMP_Text _text;
-        [SerializeField, Tooltip("Durée d'affichage en secondes (0 = reste affiché jusqu'au prochain).")]
-        private float _displayDuration = 4f;
 
-        private Coroutine _hideRoutine;
+        public bool IsPlaying { get; private set; }
+        public event Action OnDialogComplete;
+
+        private Coroutine _routine;
 
         private void Awake()
         {
@@ -26,30 +24,72 @@ namespace Core
                 return;
             }
             Instance = this;
-
             Clear();
         }
 
-        public void Show(string message)
+        public void Play(DialogLine line)
         {
-            if (_text == null) return;
-            if (string.IsNullOrWhiteSpace(message)) return;
+            if (_text == null || line == null || string.IsNullOrWhiteSpace(line.Text)) return;
 
-            if (_hideRoutine != null)
-                StopCoroutine(_hideRoutine);
+            if (_routine != null)
+                StopCoroutine(_routine);
 
-            _text.text = message;
+            _routine = StartCoroutine(PlayRoutine(line));
+        }
+
+        public void Skip()
+        {
+            if (_routine != null)
+                StopCoroutine(_routine);
+            IsPlaying = false;
+            Clear();
+            OnDialogComplete?.Invoke();
+        }
+
+        private IEnumerator PlayRoutine(DialogLine line)
+        {
+            IsPlaying = true;
+            Clear();
+
+            // Délai avant apparition
+            if (line.Delay > 0f)
+                yield return new WaitForSeconds(line.Delay);
+
             _text.gameObject.SetActive(true);
 
-            if (_displayDuration > 0f)
-                _hideRoutine = StartCoroutine(HideAfter(_displayDuration));
-        }
+            switch (line.Reveal)
+            {
+                case DialogReveal.Instant:
+                    _text.text = line.Text;
+                    break;
 
-        public void Hide()
-        {
-            if (_hideRoutine != null)
-                StopCoroutine(_hideRoutine);
+                case DialogReveal.CharByChar:
+                    _text.text = "";
+                    foreach (char c in line.Text)
+                    {
+                        _text.text += c;
+                        yield return new WaitForSeconds(line.RevealSpeed);
+                    }
+                    break;
+
+                case DialogReveal.WordByWord:
+                    _text.text = "";
+                    string[] words = line.Text.Split(' ');
+                    for (int i = 0; i < words.Length; i++)
+                    {
+                        _text.text += (i > 0 ? " " : "") + words[i];
+                        yield return new WaitForSeconds(line.RevealSpeed);
+                    }
+                    break;
+            }
+
+            // Affichage après le typewriter
+            if (line.DisplayDuration > 0f)
+                yield return new WaitForSeconds(line.DisplayDuration);
+
+            IsPlaying = false;
             Clear();
+            OnDialogComplete?.Invoke();
         }
 
         private void Clear()
@@ -59,12 +99,6 @@ namespace Core
                 _text.text = string.Empty;
                 _text.gameObject.SetActive(false);
             }
-        }
-
-        private IEnumerator HideAfter(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            Clear();
         }
     }
 }
