@@ -250,10 +250,25 @@ namespace Core
 
             Vector3 destination = _targetPlace.TargetPosition;
 
-            if (_navMeshAgent == null || !_navMeshAgent.isOnNavMesh || !_navMeshAgent.isActiveAndEnabled)
+            if (_navMeshAgent == null || !_navMeshAgent.isActiveAndEnabled)
             {
-                Debug.LogError($"[PlaceManager] NavMeshAgent invalide : agent={_navMeshAgent != null}, onNavMesh={_navMeshAgent?.isOnNavMesh}, active={_navMeshAgent?.isActiveAndEnabled}, pos={_navMeshAgent?.transform.position}");
+                Debug.LogError($"[PlaceManager] NavMeshAgent invalide : agent={_navMeshAgent != null}, active={_navMeshAgent?.isActiveAndEnabled}");
                 return;
+            }
+
+            // Auto-warp si l'agent est tombé hors NavMesh
+            if (!_navMeshAgent.isOnNavMesh)
+            {
+                if (NavMesh.SamplePosition(_navMeshAgent.transform.position, out NavMeshHit warpHit, 10f, NavMesh.AllAreas))
+                {
+                    _navMeshAgent.Warp(warpHit.position);
+                    Debug.Log($"[PlaceManager] Agent warpé sur NavMesh : {warpHit.position}");
+                }
+                else
+                {
+                    Debug.LogError($"[PlaceManager] Agent hors NavMesh et aucun point NavMesh trouvé à proximité. pos={_navMeshAgent.transform.position}");
+                    return;
+                }
             }
 
             _navMeshAgent.isStopped = false;
