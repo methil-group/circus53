@@ -273,7 +273,9 @@ namespace Core
             _state = State.Walking;
             RefreshButtons();
             _onNavigationStarted?.Invoke();
-            Debug.Log($"[PlaceManager] Navigation vers '{_targetPlace.name}' — boutons désactivés pendant la marche (pos: {destination})");
+            Debug.Log($"[PlaceManager] GO -> '{_targetPlace.name}' " +
+                $"targetPos={destination} agentPos={_navMeshAgent.transform.position} " +
+                $"onNavMesh={_navMeshAgent.isOnNavMesh} navMeshOK={ok}");
         }
 
         [ContextMenu("Snap To Current Place")]
@@ -313,14 +315,30 @@ namespace Core
         {
             if (_navMeshAgent == null || _targetPlace == null)
             {
+                Debug.Log($"[PlaceManager] STOP: agent={_navMeshAgent != null}, target={_targetPlace != null}");
                 StopNavigation();
                 return;
             }
 
-            // Chemin invalide ?
-            if (_navMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
+            bool hasP = _navMeshAgent.hasPath;
+            bool pend = _navMeshAgent.pathPending;
+            var status = _navMeshAgent.pathStatus;
+            float rem = _navMeshAgent.remainingDistance;
+            float stopDist = _navMeshAgent.stoppingDistance;
+            Vector3 agentPos = _navMeshAgent.transform.position;
+            Vector3 dest = _navMeshAgent.destination;
+
+            if (Time.frameCount % 30 == 0) // une fois par demi-seconde environ
             {
-                Debug.LogWarning($"[PlaceManager] Chemin invalide vers '{_targetPlace.name}' — abandon.");
+                Debug.Log($"[PlaceManager] WALK: agentPos={agentPos} dest={dest} hasPath={hasP} pending={pend} status={status} " +
+                    $"remaining={rem:F2} stopDist={stopDist:F2} targetPos={_targetPlace.TargetPosition}");
+            }
+
+            // Chemin invalide ?
+            if (status == NavMeshPathStatus.PathInvalid)
+            {
+                Debug.LogWarning($"[PlaceManager] ABANDON: PathInvalid vers '{_targetPlace.name}'. " +
+                    $"agentPos={agentPos} dest={dest} targetPos={_targetPlace.TargetPosition}");
                 StopNavigation();
                 return;
             }
