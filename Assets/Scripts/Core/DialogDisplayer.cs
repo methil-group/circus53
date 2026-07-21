@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System;
 
@@ -68,6 +69,7 @@ namespace Core
                     foreach (char c in line.Text)
                     {
                         _text.text += c;
+                        RefreshLayout();
                         yield return new WaitForSeconds(line.RevealSpeed);
                     }
                     break;
@@ -78,6 +80,7 @@ namespace Core
                     for (int i = 0; i < words.Length; i++)
                     {
                         _text.text += (i > 0 ? " " : "") + words[i];
+                        RefreshLayout();
                         yield return new WaitForSeconds(line.RevealSpeed);
                     }
                     break;
@@ -99,6 +102,12 @@ namespace Core
                 _text.text = string.Empty;
                 _text.gameObject.SetActive(false);
             }
+        }
+
+        private void RefreshLayout()
+        {
+            // Force le rebuild du Content Size Fitter / Vertical Layout Group
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_text.rectTransform);
         }
     }
 }
