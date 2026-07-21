@@ -137,7 +137,13 @@ namespace Core
             {
                 _navMeshAgent.speed = _speed;
                 _navMeshAgent.acceleration = _acceleration;
-                Debug.Log($"[PlaceManager] NavMeshAgent speed={_speed}, acceleration={_acceleration}");
+                _navMeshAgent.stoppingDistance = _arrivalThreshold;
+                _navMeshAgent.angularSpeed = _rotationSpeed;
+                _navMeshAgent.autoBraking = true;
+                _navMeshAgent.updatePosition = true;
+                _navMeshAgent.updateRotation = false;
+                _navMeshAgent.updateUpAxis = true;
+                Debug.Log($"[PlaceManager] NavMeshAgent config: speed={_speed}, accel={_acceleration}, stopDist={_arrivalThreshold}, radius={_navMeshAgent.radius}, height={_navMeshAgent.height}");
             }
 
             if (_circusManager == null)
