@@ -246,12 +246,22 @@ namespace Core
 
             if (_navMeshAgent == null || !_navMeshAgent.isOnNavMesh || !_navMeshAgent.isActiveAndEnabled)
             {
-                Debug.LogError($"[PlaceManager] NavMeshAgent invalide : agent={_navMeshAgent != null}, onNavMesh={_navMeshAgent?.isOnNavMesh}, active={_navMeshAgent?.isActiveAndEnabled}");
+                Debug.LogError($"[PlaceManager] NavMeshAgent invalide : agent={_navMeshAgent != null}, onNavMesh={_navMeshAgent?.isOnNavMesh}, active={_navMeshAgent?.isActiveAndEnabled}, pos={_navMeshAgent?.transform.position}");
                 return;
             }
 
             _navMeshAgent.isStopped = false;
             bool ok = _navMeshAgent.SetDestination(destination);
+
+            // Debug : vérifier si la destination est vraiment sur le NavMesh
+            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            {
+                Debug.Log($"[PlaceManager] Destination NavMesh sample OK : {hit.position} (distance={hit.distance:F3})");
+            }
+            else
+            {
+                Debug.LogWarning($"[PlaceManager] Destination PAS sur le NavMesh ! pos={destination}");
+            }
 
             if (!ok)
             {
