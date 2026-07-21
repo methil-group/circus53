@@ -74,7 +74,6 @@ namespace Core
         [SerializeField] private UnityEvent<Place> _onPlaceChanged;
         [SerializeField] private UnityEvent _onNavigationStarted;
         [SerializeField] private UnityEvent _onNavigationComplete;
-        [SerializeField] private UnityEvent<string> _onDialog; // texte du dialogue
 
         // =======================================================================
 
@@ -119,7 +118,6 @@ namespace Core
         public UnityEvent<Place> OnPlaceChanged => _onPlaceChanged;
         public UnityEvent OnNavigationStarted => _onNavigationStarted;
         public UnityEvent OnNavigationComplete => _onNavigationComplete;
-        public UnityEvent<string> OnDialog => _onDialog;
 
         // =======================================================================
 
@@ -544,7 +542,7 @@ namespace Core
                 if (string.IsNullOrWhiteSpace(line.Text)) continue;
 
                 line.HasPlayed = true;
-                _onDialog?.Invoke(line.Text);
+                DialogDisplayer.Instance?.Show(line.Text);
                 Debug.Log($"[PlaceManager] Dialogue OnArrival : \"{line.Text}\"");
             }
         }

@@ -5,21 +5,36 @@ using System.Collections;
 namespace Core
 {
     /// <summary>
-    /// Affiche un texte de dialogue sur un TMP_Text (style sous-titre).
-    /// À brancher sur le PlaceManager.OnDialog.
+    /// Affiche les dialogues en sous-titres sur un TMP_Text.
+    /// Singleton — PlaceManager l'appelle directement.
     /// </summary>
     public class DialogDisplayer : MonoBehaviour
     {
+        public static DialogDisplayer Instance { get; private set; }
+
         [SerializeField] private TMP_Text _text;
         [SerializeField, Tooltip("Durée d'affichage en secondes (0 = reste affiché jusqu'au prochain).")]
         private float _displayDuration = 4f;
 
         private Coroutine _hideRoutine;
 
-        /// <summary>Affiche le dialogue. Appelé par PlaceManager.OnDialog.</summary>
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+
+            if (_text != null)
+                _text.gameObject.SetActive(false);
+        }
+
         public void Show(string message)
         {
             if (_text == null) return;
+            if (string.IsNullOrWhiteSpace(message)) return;
 
             if (_hideRoutine != null)
                 StopCoroutine(_hideRoutine);
@@ -29,6 +44,14 @@ namespace Core
 
             if (_displayDuration > 0f)
                 _hideRoutine = StartCoroutine(HideAfter(_displayDuration));
+        }
+
+        public void Hide()
+        {
+            if (_hideRoutine != null)
+                StopCoroutine(_hideRoutine);
+            if (_text != null)
+                _text.gameObject.SetActive(false);
         }
 
         private IEnumerator HideAfter(float delay)
