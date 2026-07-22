@@ -87,6 +87,7 @@ namespace Core
         private float _alignWobbleX;
         private float _alignWobbleZ;
         private bool _blockedByDialog;
+        private float _placeTimer;
 
         // Live editor sync
         private Vector3 _lastPlacePosition;
@@ -201,6 +202,7 @@ namespace Core
             {
                 case State.Idle:
                     LiveSyncCurrentPlace();
+                    UpdatePlaceEvents(dt);
                     break;
 
                 case State.Walking:
@@ -468,6 +470,17 @@ namespace Core
             _onPlaceChanged?.Invoke(_currentPlace);
             RefreshButtons();
 
+            // Reset le timer et les events du nouveau Place
+            _placeTimer = 0f;
+            if (_currentPlace != null && _currentPlace.Events != null)
+            {
+                foreach (PlaceEvent evt in _currentPlace.Events)
+                {
+                    if (evt != null)
+                        evt.HasTriggered = false;
+                }
+            }
+
             // Jouer les dialogues OnArrival de ce Place (une seule fois chacun)
             PlayOnArrivalDialogues(_currentPlace);
 
@@ -595,6 +608,24 @@ namespace Core
 
             _blockedByDialog = false;
             RefreshButtons();
+        }
+
+        private void UpdatePlaceEvents(float dt)
+        {
+            if (_currentPlace == null || _currentPlace.Events == null) return;
+
+            _placeTimer += dt;
+
+            foreach (PlaceEvent evt in _currentPlace.Events)
+            {
+                if (evt == null || evt.OnTrigger == null) continue;
+                if (evt.Once && evt.HasTriggered) continue;
+                if (_placeTimer < evt.Delay) continue;
+
+                evt.HasTriggered = true;
+                evt.OnTrigger.Invoke();
+                Debug.Log($"[PlaceManager] Event déclenché sur '{_currentPlace.name}' après {evt.Delay}s");
+            }
         }
 
         // =======================================================================
@@ -797,6 +828,7 @@ namespace Core
         {
             _state = State.Idle;
             _targetPlace = null;
+            _placeTimer = 0f;
             if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
             {
                 _navMeshAgent.isStopped = true;

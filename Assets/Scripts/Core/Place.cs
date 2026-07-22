@@ -25,7 +25,11 @@ namespace Core
         public Place BackPlace => _backPlace;
         public Place LeftPlace => _leftPlace;
         public Place RightPlace => _rightPlace;
+        [Header("Événements temporels")]
+        [SerializeField] private PlaceEvent[] _events = Array.Empty<PlaceEvent>();
+
         public DialogLine[] Dialogues => _dialogues;
+        public PlaceEvent[] Events => _events;
 
         /// <summary>Position cible pour le joueur (venant du CameraClickPoint).</summary>
         public Vector3 TargetPosition => transform.position;
