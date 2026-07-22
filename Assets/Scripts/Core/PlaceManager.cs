@@ -623,7 +623,11 @@ namespace Core
                 if (_placeTimer < evt.Delay) continue;
 
                 evt.HasTriggered = true;
-                evt.OnTrigger.Invoke();
+                if (evt.Dialog != null && !string.IsNullOrWhiteSpace(evt.Dialog.Text))
+                {
+                    DialogDisplayer.Instance?.Play(evt.Dialog);
+                }
+                evt.OnTrigger?.Invoke();
                 Debug.Log($"[PlaceManager] Event déclenché sur '{_currentPlace.name}' après {evt.Delay}s");
             }
         }

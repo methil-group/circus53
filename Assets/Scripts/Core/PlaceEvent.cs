@@ -16,6 +16,9 @@ namespace Core
         [Tooltip("Se déclenche une seule fois ou à chaque visite.")]
         public bool Once = true;
 
+        [Tooltip("Si renseigné, ce dialogue est joué avant le UnityEvent.")]
+        public DialogLine Dialog;
+
         [Tooltip("L'événement à lancer (peut appeler une animation, un son, etc.).")]
         public UnityEvent OnTrigger;
 
