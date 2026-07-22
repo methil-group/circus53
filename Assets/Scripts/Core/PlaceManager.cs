@@ -424,8 +424,20 @@ namespace Core
             _navMeshAgent.isStopped = true;
             _navMeshAgent.ResetPath();
 
+            // Rotation actuelle de la CAMÉRA
+            Quaternion currentCameraRotation = Camera.main != null
+                ? Camera.main.transform.rotation
+                : _navMeshAgent.transform.rotation;
+
+            // Direction cible pour la CAMÉRA
+            Quaternion targetCameraRotation = _targetPlace.LookRotation;
+
+            // Delta de rotation caméra
+            Quaternion cameraDelta = targetCameraRotation * Quaternion.Inverse(currentCameraRotation);
+
+            // Appliquer ce delta au root pour que la caméra finisse sur LookRotation
             _alignFromRotation = _navMeshAgent.transform.rotation;
-            _alignToRotation = _targetPlace.LookRotation;
+            _alignToRotation = cameraDelta * _navMeshAgent.transform.rotation;
 
             // Wobble aléatoire sur les axes X (pitch) et Z (roll) pour l'effet essouflé
             _alignWobbleX = Random.Range(-3f, 3f);
