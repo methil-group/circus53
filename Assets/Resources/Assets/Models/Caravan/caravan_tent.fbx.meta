@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 49b6636a99f2cfd4e9336e9b3b06ddac
+guid: ba684f1850bfd3644aecd0e7658ba651
 ModelImporter:
   serializedVersion: 24501
   internalIDToNameTable: []
@@ -7,8 +7,18 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: uv_checker_material_uv_grid_1024x1024
-    second: {fileID: 2100000, guid: 9c1088c3217c83544b6adc02f6145089, type: 2}
+      name: Material
+    second: {fileID: 2100000, guid: 44f4349860a20594bbe3328e9eaf0000, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: 8c1ca0f9fa849a5489db636b47f00783, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: wood
+    second: {fileID: 2100000, guid: 7d90e04a4c616244ba240b2a87dbe867, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
