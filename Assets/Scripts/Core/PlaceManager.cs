@@ -183,16 +183,8 @@ namespace Core
                 _circusManager?.SelectPlace(_currentPlace);
                 _onPlaceChanged?.Invoke(_currentPlace);
 
-                // Warp immédiat à la position et orientation de la Place de départ
-                if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh)
-                {
-                    _navMeshAgent.Warp(_currentPlace.TargetPosition);
-                    _navMeshAgent.transform.rotation = _currentPlace.LookRotation;
-                }
-
-                // Init trackers pour le live sync
-                _lastPlacePosition = _currentPlace.TargetPosition;
-                _lastPlaceRotation = _currentPlace.LookRotation;
+                // Warp avec compensation caméra
+                WarpToPlace(_currentPlace);
 
                 Debug.Log($"[PlaceManager] Place de départ : '{_currentPlace.name}' " +
                     $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
@@ -318,6 +310,37 @@ namespace Core
                 $"onNavMesh={_navMeshAgent.isOnNavMesh} navMeshOK={ok}");
         }
 
+        /// <summary>Warp le joueur à la position du Place et oriente la caméra sur LookRotation.</summary>
+        private void WarpToPlace(Place place)
+        {
+            if (_navMeshAgent == null || !_navMeshAgent.isOnNavMesh || place == null) return;
+
+            Vector3 targetPos = place.TargetPosition;
+            Quaternion targetCamRotation = place.LookRotation;
+
+            // Offset caméra → root
+            Quaternion cameraOffset = Camera.main != null
+                ? Quaternion.Inverse(_navMeshAgent.transform.rotation) * Camera.main.transform.rotation
+                : Quaternion.identity;
+
+            Quaternion targetRootRotation = targetCamRotation * Quaternion.Inverse(cameraOffset);
+
+            _navMeshAgent.Warp(targetPos);
+            _navMeshAgent.transform.rotation = targetRootRotation;
+
+            _lastPlacePosition = targetPos;
+            _lastPlaceRotation = place.LookRotation;
+
+            // Reset head bob defaults
+            if (_headBobTarget != null)
+            {
+                _defaultBobPosition = _headBobTarget.localPosition;
+                _defaultBobRotation = _headBobTarget.localRotation;
+            }
+
+            Debug.Log($"[PlaceManager] Warp -> '{place.name}' camRot={targetCamRotation.eulerAngles} rootRot={targetRootRotation.eulerAngles}");
+        }
+
         [ContextMenu("Snap To Current Place")]
         private void SnapToCurrentPlace()
         {
@@ -326,25 +349,7 @@ namespace Core
                 Debug.LogWarning("[PlaceManager] Pas de Place courant.");
                 return;
             }
-
-            if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh)
-            {
-                _navMeshAgent.Warp(_currentPlace.TargetPosition);
-                _navMeshAgent.transform.rotation = _currentPlace.LookRotation;
-            }
-
-            _lastPlacePosition = _currentPlace.TargetPosition;
-            _lastPlaceRotation = _currentPlace.LookRotation;
-
-            // Reset head bob defaults après warp
-            if (_headBobTarget != null)
-            {
-                _defaultBobPosition = _headBobTarget.localPosition;
-                _defaultBobRotation = _headBobTarget.localRotation;
-            }
-
-            Debug.Log($"[PlaceManager] Snap vers '{_currentPlace.name}' " +
-                $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
+            WarpToPlace(_currentPlace);
         }
 
         // =======================================================================
@@ -424,6 +429,13 @@ namespace Core
             _navMeshAgent.isStopped = true;
             _navMeshAgent.ResetPath();
 
+            // Reset immédiat du head bob pour capturer la vraie rotation caméra
+            if (_headBobTarget != null && _hasDefaultBobPos)
+            {
+                _headBobTarget.localPosition = _defaultBobPosition;
+                _headBobTarget.localRotation = _defaultBobRotation;
+            }
+
             // Rotation actuelle de la CAMÉRA
             Quaternion currentCameraRotation = Camera.main != null
                 ? Camera.main.transform.rotation
@@ -435,9 +447,11 @@ namespace Core
             // Delta de rotation caméra
             Quaternion cameraDelta = targetCameraRotation * Quaternion.Inverse(currentCameraRotation);
 
-            // Appliquer ce delta au root pour que la caméra finisse sur LookRotation
+            // Appliquer ce delta au root
             _alignFromRotation = _navMeshAgent.transform.rotation;
             _alignToRotation = cameraDelta * _navMeshAgent.transform.rotation;
+
+            Debug.Log($"[PlaceManager] ALIGN: camFrom={currentCameraRotation.eulerAngles} camTo={targetCameraRotation.eulerAngles} delta={cameraDelta.eulerAngles} rootFrom={_alignFromRotation.eulerAngles} rootTo={_alignToRotation.eulerAngles}");
 
             // Wobble aléatoire sur les axes X (pitch) et Z (roll) pour l'effet essouflé
             _alignWobbleX = Random.Range(-3f, 3f);
@@ -757,7 +771,12 @@ namespace Core
                 if (_navMeshAgent.isOnNavMesh)
                 {
                     _navMeshAgent.Warp(currentPos);
-                    _navMeshAgent.transform.rotation = currentRot;
+
+                    // Compensation caméra
+                    Quaternion cameraOffset = Camera.main != null
+                        ? Quaternion.Inverse(_navMeshAgent.transform.rotation) * Camera.main.transform.rotation
+                        : Quaternion.identity;
+                    _navMeshAgent.transform.rotation = currentRot * Quaternion.Inverse(cameraOffset);
                 }
 
                 _lastPlacePosition = currentPos;
