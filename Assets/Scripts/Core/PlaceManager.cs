@@ -470,16 +470,8 @@ namespace Core
             _onPlaceChanged?.Invoke(_currentPlace);
             RefreshButtons();
 
-            // Reset le timer et les events du nouveau Place
+            // Reset le timer
             _placeTimer = 0f;
-            if (_currentPlace != null && _currentPlace.Events != null)
-            {
-                foreach (PlaceEvent evt in _currentPlace.Events)
-                {
-                    if (evt != null)
-                        evt.HasTriggered = false;
-                }
-            }
 
             // Jouer les dialogues OnArrival de ce Place (une seule fois chacun)
             PlayOnArrivalDialogues(_currentPlace);
