@@ -79,6 +79,9 @@ namespace Core
         [SerializeField, Tooltip("Cooldown entre deux clics (secondes).")]
         private float _cooldown;
 
+        [SerializeField, Tooltip("Si coché, bloque les déplacements du joueur pendant l'interaction.")]
+        private bool _blockMovement = true;
+
         // ===================================================================
 
         private AudioSource _audioSource;
@@ -201,6 +204,10 @@ namespace Core
                     return;
             }
 
+            // Si le joueur a ses déplacements déjà bloqués par autre chose, on n'interagit pas
+            if (PlaceManager.Instance != null && !PlaceManager.Instance.CanNavigate)
+                return;
+
             // Cooldown
             if (_cooldown > 0f && Time.time - _lastInteractTime < _cooldown)
                 return;
@@ -217,7 +224,8 @@ namespace Core
             SetOutlineActive(false);
 
             // Bloquer les déplacements
-            PlaceManager.Instance?.SetBlocked(true);
+            if (_blockMovement)
+                PlaceManager.Instance?.SetBlocked(true);
 
             _routine = StartCoroutine(InteractRoutine());
         }
@@ -241,7 +249,9 @@ namespace Core
                 _dialogPanel.SetActive(false);
 
             // Débloquer les déplacements
-            PlaceManager.Instance?.SetBlocked(false);
+            // Débloquer les déplacements
+            if (_blockMovement)
+                PlaceManager.Instance?.SetBlocked(false);
 
             _isPlaying = false;
 
@@ -283,6 +293,8 @@ namespace Core
         private bool IsInteractionAvailable()
         {
             if (_isPlaying)
+                return false;
+            if (PlaceManager.Instance != null && !PlaceManager.Instance.CanNavigate)
                 return false;
             if (_playOnce && _hasPlayed)
                 return false;
@@ -337,7 +349,9 @@ namespace Core
                 _dialogPanel.SetActive(false);
 
             // Débloquer les déplacements
-            PlaceManager.Instance?.SetBlocked(false);
+            // Débloquer les déplacements
+            if (_blockMovement)
+                PlaceManager.Instance?.SetBlocked(false);
 
             _isPlaying = false;
             _routine = null;
