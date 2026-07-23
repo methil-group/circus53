@@ -1,8 +1,8 @@
 ﻿<Solution>
   <Project Path="Assembly-CSharp-firstpass.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Masking.Runtime.csproj" />
   <Project Path="MackySoft.SerializeReferenceExtensions.Editor.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="MackySoft.SerializeReferenceExtensions.csproj" />
   <Project Path="Masking.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />

@@ -1,6 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using VolFx;
 
@@ -26,6 +28,20 @@ namespace Core
         [SerializeField, Tooltip("Seuil critique (0-1).")]
         [Range(0f, 1f)] private float _criticalAnxietyThreshold = 0.8f;
 
+        [Header("Max Anxiety")]
+        [SerializeField, Tooltip("Son joué en boucle quand l'anxiété atteint son max.")]
+        private AudioClip _maxAnxietyLoopSound;
+        [SerializeField, Tooltip("GameObject qui apparaît quand l'anxiété atteint son max.")]
+        private GameObject _maxAnxietyObject;
+        [SerializeField, Tooltip("Délai avant l'apparition du GameObject (secondes).")]
+        private float _objectAppearDelay = 5f;
+        [SerializeField, Tooltip("Si coché, bloque les déplacements du joueur au max.")]
+        private bool _blockMovementOnMax = true;
+        [SerializeField, Tooltip("Délai avant de changer de scène au max (secondes).")]
+        private float _sceneChangeDelay = 3f;
+        [SerializeField, Tooltip("Build index de la scène cible.")]
+        private int _targetSceneBuildIndex = 1;
+
         [Header("Dither Effect")]
         [SerializeField, Tooltip("Volume global de la scène contenant le MethilDither.")]
         private Volume _globalVolume;
@@ -50,6 +66,8 @@ namespace Core
         private float _increaseTimer;
         private bool _wasHigh;
         private bool _wasCritical;
+        private bool _hasTriggeredMax;
+        private AudioSource _audioSource;
         private MethilDitherVol _ditherVol;
 
         /// <summary>Anxiété actuelle.</summary>
@@ -91,6 +109,16 @@ namespace Core
             _increaseTimer = 0f;
             _wasHigh = false;
             _wasCritical = false;
+            _hasTriggeredMax = false;
+
+            _audioSource = GetComponent<AudioSource>();
+            if (_audioSource == null)
+                _audioSource = gameObject.AddComponent<AudioSource>();
+            _audioSource.loop = true;
+            _audioSource.playOnAwake = false;
+
+            if (_maxAnxietyObject != null)
+                _maxAnxietyObject.SetActive(false);
         }
 
         private void Start()
@@ -153,6 +181,61 @@ namespace Core
 
             _onAnxietyChanged?.Invoke(NormalizedAnxiety);
             CheckThresholds();
+
+            // Max anxiety reached
+            if (NormalizedAnxiety >= 1f && !_hasTriggeredMax)
+            {
+                TriggerMaxAnxiety();
+            }
+        }
+
+        private void TriggerMaxAnxiety()
+        {
+            _hasTriggeredMax = true;
+            Debug.Log("[AnxietyManager] Anxiété maximale atteinte.");
+
+            // Bloquer les déplacements
+            if (_blockMovementOnMax)
+            {
+                PlaceManager.Instance?.SetBlocked(true);
+            }
+
+            // Lancer le son en boucle
+            if (_maxAnxietyLoopSound != null && _audioSource != null)
+            {
+                _audioSource.clip = _maxAnxietyLoopSound;
+                _audioSource.Play();
+            }
+
+            // Apparition de l'objet après délai + changement de scène
+            StartCoroutine(MaxAnxietyRoutine());
+        }
+
+        private IEnumerator MaxAnxietyRoutine()
+        {
+            float elapsed = 0f;
+            bool objectShown = false;
+
+            while (true)
+            {
+                elapsed += Time.deltaTime;
+
+                // Apparition de l'objet
+                if (!objectShown && elapsed >= _objectAppearDelay && _maxAnxietyObject != null)
+                {
+                    objectShown = true;
+                    _maxAnxietyObject.SetActive(true);
+                }
+
+                // Changement de scène
+                if (elapsed >= _sceneChangeDelay)
+                {
+                    SceneManager.LoadScene(_targetSceneBuildIndex);
+                    yield break;
+                }
+
+                yield return null;
+            }
         }
 
         /// <summary>
