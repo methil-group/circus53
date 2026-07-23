@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
@@ -576,9 +577,21 @@ namespace Core
         // Dialogues
         // =======================================================================
 
+        private Coroutine _dialogChainRoutine;
+
         private void PlayOnArrivalDialogues(Place place)
         {
-            if (place == null || place.Dialogues == null) return;
+            if (place == null || place.Dialogues == null || place.Dialogues.Length == 0) return;
+
+            if (_dialogChainRoutine != null)
+                StopCoroutine(_dialogChainRoutine);
+
+            _dialogChainRoutine = StartCoroutine(DialogChainRoutine(place));
+        }
+
+        private IEnumerator DialogChainRoutine(Place place)
+        {
+            bool blocked = false;
 
             foreach (DialogLine line in place.Dialogues)
             {
@@ -588,8 +601,9 @@ namespace Core
 
                 line.HasPlayed = true;
 
-                if (line.BlockMovement)
+                if (line.BlockMovement && !blocked)
                 {
+                    blocked = true;
                     _blockedByDialog = true;
                     RefreshButtons();
                 }
@@ -597,22 +611,24 @@ namespace Core
                 DialogDisplayer.Instance?.Play(line);
                 Debug.Log($"[PlaceManager] Dialogue OnArrival : \"{line.Text}\"");
 
-                // On ne joue qu'un seul dialogue à la fois
-                if (line.BlockMovement)
+                // Attend que ce dialogue se termine
+                if (DialogDisplayer.Instance != null)
                 {
-                    DialogDisplayer.Instance.OnDialogComplete += OnDialogFinished;
+                    bool finished = false;
+                    System.Action handler = () => finished = true;
+                    DialogDisplayer.Instance.OnDialogComplete += handler;
+                    yield return new WaitUntil(() => finished);
+                    DialogDisplayer.Instance.OnDialogComplete -= handler;
                 }
-                break;
             }
-        }
 
-        private void OnDialogFinished()
-        {
-            if (DialogDisplayer.Instance != null)
-                DialogDisplayer.Instance.OnDialogComplete -= OnDialogFinished;
+            if (blocked)
+            {
+                _blockedByDialog = false;
+                RefreshButtons();
+            }
 
-            _blockedByDialog = false;
-            RefreshButtons();
+            _dialogChainRoutine = null;
         }
 
         private void UpdatePlaceEvents(float dt)

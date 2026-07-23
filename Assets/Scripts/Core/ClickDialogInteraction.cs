@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Core
 {
@@ -143,9 +144,10 @@ namespace Core
 
             // Raycast depuis la caméra vers la souris
             Camera cam = Camera.main;
-            if (cam == null || _collider == null) return;
+            if (cam == null || _collider == null || Mouse.current == null) return;
 
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            Vector2 mousePos = Mouse.current.position.ReadValue();
+            Ray ray = cam.ScreenPointToRay(mousePos);
             bool hitThis = Physics.Raycast(ray, out RaycastHit hit, 100f) && hit.collider == _collider;
 
             // Hover enter / exit
@@ -175,7 +177,7 @@ namespace Core
             }
 
             // Clic
-            if (_wasHovered && Input.GetMouseButtonDown(0))
+            if (_wasHovered && Mouse.current.leftButton.wasPressedThisFrame)
             {
                 Interact();
             }
@@ -311,13 +313,18 @@ namespace Core
                 {
                     DialogEntry entry = _dialogues[i];
                     if (entry == null || string.IsNullOrWhiteSpace(entry.Text))
+                    {
+                        Debug.LogWarning($"[ClickDialogInteraction] Dialogue {i} ignoré : vide ou null.");
                         continue;
+                    }
+
+                    Debug.Log($"[ClickDialogInteraction] Dialogue {i}/{_dialogues.Length} : \"{entry.Text}\"");
 
                     // Son
                     PlayVoice(entry.VoiceClip);
 
                     // Révéler le texte
-                    yield return StartCoroutine(RevealTextRoutine(entry));
+                    yield return RevealTextRoutine(entry);
 
                     // Attendre la durée d'affichage
                     if (entry.DisplayDuration > 0f)
