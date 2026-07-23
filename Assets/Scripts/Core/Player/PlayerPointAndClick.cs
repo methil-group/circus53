@@ -1,6 +1,5 @@
 using System;
 using Framework;
-using Framework.Camera;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -9,7 +8,7 @@ namespace Core.Player
 {
     /// <summary>
     /// Système de déplacement point & click.
-    /// Remplace PlayerMovement : le joueur clique sur une ClickableZone,
+    /// Le joueur clique sur un CameraClickPoint,
     /// tourne la tête vers la cible, puis marche jusqu'à elle.
     /// Head bob pendant la marche.
     /// </summary>
@@ -59,12 +58,8 @@ namespace Core.Player
         private Transform _cameraTransform;
         private PointAndClickRayDebug _rayDebug;
         private Transform _bobTarget;
-        private MethilCamera _methilCamera;
-
         private State _state = State.Idle;
-        private ClickableZone _currentTarget;
         private CameraClickPoint _currentCameraPoint;
-        private ClickableZone _hoveredZone;
         private CameraClickPoint _hoveredCameraPoint;
         private Vector3 _targetPosition;
         private bool _isMoving;
@@ -93,7 +88,7 @@ namespace Core.Player
         public bool IsMoving => _isMoving;
 
         /// <summary>La zone actuellement survolée (null si aucune).</summary>
-        public ClickableZone HoveredZone => _hoveredZone;
+        public CameraClickPoint HoveredCameraPoint => _hoveredCameraPoint;
 
         // =======================================================================
 
@@ -144,11 +139,6 @@ namespace Core.Player
                 {
                     Debug.LogError("[PointAndClick] Aucun NavMesh dans un rayon de 100 unités ! Il faut baker un NavMesh (Window > AI > Navigation > Bake).");
                 }
-            }
-
-            if (_cameraTransform != null)
-            {
-                _methilCamera = _cameraTransform.GetComponent<MethilCamera>();
             }
 
             // Init bob transform
@@ -225,7 +215,6 @@ namespace Core.Player
             Ray ray = cam.ScreenPointToRay(mousePos);
             _lastInteractionRay = ray;
 
-            ClickableZone zone = null;
             CameraClickPoint cameraPoint = null;
             float nearestInteractiveDistance = float.MaxValue;
 
@@ -234,14 +223,12 @@ namespace Core.Player
             _lastInteractionHits = Physics.RaycastAll(ray, 100f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide);
             foreach (RaycastHit hit in _lastInteractionHits)
             {
-                ClickableZone candidateZone = hit.collider.GetComponentInParent<ClickableZone>();
                 CameraClickPoint candidateCameraPoint = hit.collider.GetComponentInParent<CameraClickPoint>();
 
-                if ((candidateZone == null && candidateCameraPoint == null) || hit.distance >= nearestInteractiveDistance)
+                if (candidateCameraPoint == null || hit.distance >= nearestInteractiveDistance)
                     continue;
 
                 nearestInteractiveDistance = hit.distance;
-                zone = candidateZone;
                 cameraPoint = candidateCameraPoint;
             }
 
@@ -249,18 +236,14 @@ namespace Core.Player
             // du décor, mais trop petite pour être visée à distance. Quand les
             // gizmos sont visibles, on autorise donc aussi un clic près de
             // l'icône caméra affichée à l'écran.
-            if (zone == null && cameraPoint == null)
+            if (cameraPoint == null)
                 cameraPoint = FindCameraPointNearCursor(cam, mousePos);
 
-            if (cameraPoint != _hoveredCameraPoint || zone != _hoveredZone)
+            if (cameraPoint != _hoveredCameraPoint)
             {
-                _hoveredZone = zone;
                 _hoveredCameraPoint = cameraPoint;
 
-                if (zone != null && zone.CursorIcon != null)
-                    SetCursor(zone.CursorIcon, zone.CursorHotspot);
-                else
-                    SetCursor(defaultCursor, defaultCursorHotspot);
+                SetCursor(defaultCursor, defaultCursorHotspot);
             }
         }
 
@@ -294,18 +277,10 @@ namespace Core.Player
             if (!IsClickPressed()) return;
             if (_hoveredCameraPoint != null)
             {
-                _currentTarget = null;
                 _currentCameraPoint = _hoveredCameraPoint;
                 _targetPosition = _currentCameraPoint.transform.position;
                 StartTravelToCurrentTarget();
-                return;
             }
-            if (_hoveredZone == null) return;
-
-            _currentTarget = _hoveredZone;
-            _currentCameraPoint = null;
-            _targetPosition = _currentTarget.TargetPosition;
-            StartTravelToCurrentTarget();
         }
 
         private void StartTravelToCurrentTarget()
@@ -364,7 +339,7 @@ namespace Core.Player
 
         private void UpdateMovement(float dt)
         {
-            if (_currentTarget == null && _currentCameraPoint == null)
+            if (_currentCameraPoint == null)
             {
                 StopNavigation();
                 return;
@@ -422,7 +397,6 @@ namespace Core.Player
         {
             _state = State.Idle;
             _isMoving = false;
-            _currentTarget = null;
             _currentCameraPoint = null;
             SafeSetStopped(true);
             if (_navMeshAgent != null && _navMeshAgent.isOnNavMesh && _navMeshAgent.isActiveAndEnabled)
@@ -463,25 +437,7 @@ namespace Core.Player
                 _state = State.AligningView;
 
                 _currentCameraPoint = null;
-                return;
             }
-
-            // Orienter la caméra vers la cible de regard
-            if (_currentTarget.LookAtTarget != null && _methilCamera != null)
-            {
-                _methilCamera.LookAtSmooth(_currentTarget.LookAtTarget.gameObject, lookAtDuration);
-            }
-
-            // Drain de santé mentale
-            if (_currentTarget.SanityDrain > 0f && SanityManager.Instance != null)
-            {
-                SanityManager.Instance.Drain(_currentTarget.SanityDrain);
-            }
-
-            // Événement d'arrivée
-            _currentTarget.OnArrival?.Invoke();
-
-            _currentTarget = null;
         }
 
         // =======================================================================

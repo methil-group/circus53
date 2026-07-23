@@ -15,4 +15,5 @@ MonoBehaviour:
   database:
   - {fileID: 11400000, guid: e93d0b35d28073a47a4f3e0242c6b675, type: 2}
   - {fileID: 11400000, guid: f90a96b202bd11a4993123ea843ad0e2, type: 2}
-  startScene: {fileID: 11400000, guid: f90a96b202bd11a4993123ea843ad0e2, type: 2}
+  - {fileID: 11400000, guid: d5f643af5e3b3174494fdd399458368c, type: 2}
+  startScene: {fileID: 11400000, guid: d5f643af5e3b3174494fdd399458368c, type: 2}

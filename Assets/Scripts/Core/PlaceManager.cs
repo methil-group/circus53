@@ -117,6 +117,13 @@ namespace Core
 
         public bool IsNavigating => _state != State.Idle;
 
+        /// <summary>Bloque ou débloque les déplacements (appelé par ClickDialogInteraction, etc.).</summary>
+        public void SetBlocked(bool blocked)
+        {
+            _blockedByDialog = blocked;
+            RefreshButtons();
+        }
+
         public UnityEvent<Place> OnPlaceChanged => _onPlaceChanged;
         public UnityEvent OnNavigationStarted => _onNavigationStarted;
         public UnityEvent OnNavigationComplete => _onNavigationComplete;
@@ -186,6 +193,12 @@ namespace Core
 
                 // Warp avec compensation caméra
                 WarpToPlace(_currentPlace);
+
+                // Reset le timer des PlaceEvents
+                _placeTimer = 0f;
+
+                // Jouer les dialogues OnArrival de la Place de départ
+                PlayOnArrivalDialogues(_currentPlace);
 
                 Debug.Log($"[PlaceManager] Place de départ : '{_currentPlace.name}' " +
                     $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
