@@ -20,5 +20,9 @@ namespace Core.Player
         [Header("Dialogue")]
         [field: SerializeField, Tooltip("Sons de machine à écrire (un est choisi au hasard à chaque dialogue).")]
         public AudioClip[] TypingSounds { get; private set; }
+
+        [Header("Ambiance")]
+        [field: SerializeField, Tooltip("Ambiance globale jouée en boucle dans la scène du circus.")]
+        public AudioClip GlobalAmbientSound { get; private set; }
     }
 }

@@ -1218,6 +1218,7 @@ GameObject:
   - component: {fileID: 1542516890100445782}
   - component: {fileID: 8183620409221866050}
   - component: {fileID: 1881982367219405656}
+  - component: {fileID: 5720602323730803113}
   m_Layer: 0
   m_Name: PauseCircusPlace
   m_TagString: Untagged
@@ -1336,6 +1337,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 1
           m_CallState: 2
+        - m_Target: {fileID: 5720602323730803113}
+          m_TargetAssemblyTypeName: UnityEngine.AudioSource, UnityEngine
+          m_MethodName: set_enabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
 --- !u!95 &1881982367219405656
 Animator:
   serializedVersion: 7
@@ -1358,6 +1371,103 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!82 &5720602323730803113
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838080985851800639}
+  m_Enabled: 0
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: f050a92f30bf17b47b1e698a7768de33, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1991587997178764960
 GameObject:
   m_ObjectHideFlags: 0
@@ -3490,7 +3600,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.Place
   _frontPlace: {fileID: 0}
-  _backPlace: {fileID: 0}
+  _backPlace: {fileID: 7320838954594873423}
   _leftPlace: {fileID: 6127798936096572718}
   _rightPlace: {fileID: 8804364803984963603}
   _lookDirection: {x: -0.5, y: 0, z: -1}
@@ -3584,7 +3694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.Place
   _frontPlace: {fileID: 1006111134718625253}
-  _backPlace: {fileID: 0}
+  _backPlace: {fileID: 7320838954594873423}
   _leftPlace: {fileID: 4955092343713333404}
   _rightPlace: {fileID: 8670777917261781214}
   _lookDirection: {x: -0.3, y: 0, z: 1}
@@ -9948,22 +10058,22 @@ MonoBehaviour:
   - Text: hello you... you shouldn't be there...
     RevealMode: 1
     RevealSpeed: 0.05
-    DisplayDuration: 4
+    DisplayDuration: 2.5
     VoiceClip: {fileID: 0}
   - Text: there might be a door around?..
     RevealMode: 1
     RevealSpeed: 0.05
-    DisplayDuration: 4
+    DisplayDuration: 3
     VoiceClip: {fileID: 0}
   - Text: but where is the key?...
     RevealMode: 1
     RevealSpeed: 0.05
-    DisplayDuration: 4
+    DisplayDuration: 2.5
     VoiceClip: {fileID: 0}
   - Text: i have the impression that it is inside me... this key
     RevealMode: 1
     RevealSpeed: 0.05
-    DisplayDuration: 4
+    DisplayDuration: 3
     VoiceClip: {fileID: 0}
   _volume: 1
   _requiredPlace: {fileID: 1831632594346962509}
@@ -9994,7 +10104,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.4, y: 6.81, z: 2.62}
+  m_Size: {x: 4.49, y: 8.03, z: 2.62}
   m_Center: {x: -1.91, y: 2.36, z: 4.27}
 --- !u!1 &8321813724229610921 stripped
 GameObject:

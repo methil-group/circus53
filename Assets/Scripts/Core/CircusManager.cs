@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Player;
 using UnityEngine;
 
 namespace Core
@@ -11,6 +12,29 @@ namespace Core
 
         /// <summary>True si le joueur possède la clé.</summary>
         public bool HasKey { get; set; }
+
+        // =======================================================================
+
+        private AudioSource _globalAmbientSource;
+
+        private void Start()
+        {
+            // Ambiance globale
+            var clip = PlayerSounds.Instance?.GlobalAmbientSound;
+            if (clip != null)
+            {
+                _globalAmbientSource = gameObject.AddComponent<AudioSource>();
+                _globalAmbientSource.playOnAwake = false;
+                _globalAmbientSource.loop = true;
+                _globalAmbientSource.spatialBlend = 0f;
+                _globalAmbientSource.clip = clip;
+                _globalAmbientSource.volume = 0.5f;
+                _globalAmbientSource.Play();
+                Debug.Log($"[CircusManager] 🌍 Ambiance globale : {clip.name}");
+            }
+        }
+
+        // =======================================================================
 
         public void SelectPlace(Place selectedPlace)
         {
