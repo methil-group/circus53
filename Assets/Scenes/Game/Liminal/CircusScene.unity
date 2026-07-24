@@ -4879,6 +4879,50 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[3].Text
+      value: i have the impression that...
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[4].Text
+      value: the keys... i may  have it
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[5].Text
+      value: but not here
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[4].RevealMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[5].RevealMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[4].RevealSpeed
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[5].RevealSpeed
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[3].DisplayDuration
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[4].DisplayDuration
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 24641437132746857, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _dialogues.Array.data[5].DisplayDuration
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 436839930337878983, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -4943,10 +4987,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3641772590634451277, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _dialogues.Array.data[0].VoiceClip
-      value: 
-      objectReference: {fileID: 8300000, guid: e8ab24db4b7eaf448b53feec90096ede, type: 3}
     - target: {fileID: 3915418373046306102, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
       value: 0
@@ -4965,7 +5005,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4247079702049199334, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 1995.27
       objectReference: {fileID: 0}
     - target: {fileID: 4247079702049199334, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -4997,7 +5037,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5340344061202270541, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 817.85
       objectReference: {fileID: 0}
     - target: {fileID: 5340344061202270541, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -5025,7 +5065,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5690634833272500964, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 1209.36
       objectReference: {fileID: 0}
     - target: {fileID: 5690634833272500964, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -5039,46 +5079,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -71.505
       objectReference: {fileID: 0}
-    - target: {fileID: 5720602323730803113, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: m_Resource
-      value: 
-      objectReference: {fileID: 8300000, guid: c316e3063a177d448844b705e8ac90f4, type: 3}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[0].Text
-      value: the door is locked... i need a key.
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[1].Text
-      value: irma may have the answer
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[0].RevealMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[1].RevealMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[0].RevealSpeed
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[1].RevealSpeed
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[0].DisplayDuration
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _lockedDialogues.Array.data[1].DisplayDuration
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 6212492107013190672, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -5089,7 +5089,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6212492107013190672, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 359.28
       objectReference: {fileID: 0}
     - target: {fileID: 6212492107013190672, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -5166,22 +5166,6 @@ PrefabInstance:
     - target: {fileID: 8335278695117315009, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -35.755
-      objectReference: {fileID: 0}
-    - target: {fileID: 8420102714100093693, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _dialogues.Array.data[0].DisplayDuration
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8420102714100093693, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _dialogues.Array.data[1].DisplayDuration
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8420102714100093693, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _dialogues.Array.data[3].DisplayDuration
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8420102714100093693, guid: f70480c298798c042b2a042dc643121d, type: 3}
-      propertyPath: _dialogues.Array.data[4].DisplayDuration
-      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 8673094354051765317, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x

@@ -1382,7 +1382,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: f050a92f30bf17b47b1e698a7768de33, type: 3}
+  m_Resource: {fileID: 8300000, guid: c316e3063a177d448844b705e8ac90f4, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -5512,7 +5512,15 @@ MonoBehaviour:
   _lookDirection: {x: 3.5, y: 0, z: 1}
   _dialogues:
   - Text: where are the keys...
-    Trigger: 0
+    Trigger: 1
+    Delay: 1
+    Reveal: 1
+    RevealSpeed: 0.05
+    DisplayDuration: 3
+    BlockMovement: 0
+    Sound: {fileID: 0}
+  - Text: i need to go find the door...
+    Trigger: 2
     Delay: 1
     Reveal: 1
     RevealSpeed: 0.05
@@ -5616,7 +5624,7 @@ MonoBehaviour:
     Delay: 0
     Reveal: 1
     RevealSpeed: 0.05
-    DisplayDuration: 6
+    DisplayDuration: 4
     BlockMovement: 1
     Sound: {fileID: 0}
   - Text: i told mom that i was stressed to go on stage...
@@ -5624,7 +5632,7 @@ MonoBehaviour:
     Delay: 0
     Reveal: 1
     RevealSpeed: 0.05
-    DisplayDuration: 4
+    DisplayDuration: 3
     BlockMovement: 1
     Sound: {fileID: 0}
   - Text: why is everyone not here...
@@ -5640,7 +5648,7 @@ MonoBehaviour:
     Delay: 0
     Reveal: 1
     RevealSpeed: 0.05
-    DisplayDuration: 4
+    DisplayDuration: 3
     BlockMovement: 1
     Sound: {fileID: 0}
   - Text: fast...
@@ -5648,7 +5656,7 @@ MonoBehaviour:
     Delay: 0
     Reveal: 1
     RevealSpeed: 0.05
-    DisplayDuration: 2
+    DisplayDuration: 1.3
     BlockMovement: 1
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
@@ -7837,7 +7845,7 @@ MonoBehaviour:
     RevealMode: 1
     RevealSpeed: 0.05
     DisplayDuration: 4
-    VoiceClip: {fileID: 8300000, guid: 8c4affb7b67a72040804390af74360e7, type: 3}
+    VoiceClip: {fileID: 8300000, guid: e8ab24db4b7eaf448b53feec90096ede, type: 3}
   _volume: 1
   _requiredPlace: {fileID: 3028672212350050128}
   _outline: {fileID: 6057821792239888987}
@@ -9336,7 +9344,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.410001
+      value: 6.02
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9344,7 +9352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.42
+      value: 4.16
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -9636,11 +9644,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Core.DoorInteraction
   _dialogPanel: {fileID: 3755697119802344769}
   _dialogText: {fileID: 4899073897977706131}
-  _lockedText: the door is locked... i need a key.
-  _revealMode: 1
-  _revealSpeed: 0.05
-  _displayDuration: 4
-  _lockedVoiceClip: {fileID: 0}
+  _lockedDialogues:
+  - Text: the door is locked... i need a key.
+    RevealMode: 1
+    RevealSpeed: 0.05
+    DisplayDuration: 3
+    VoiceClip: {fileID: 0}
+  - Text: irma may have the answer
+    RevealMode: 1
+    RevealSpeed: 0.05
+    DisplayDuration: 3
+    VoiceClip: {fileID: 0}
   _volume: 1
   _targetSceneBuildIndex: 3
   _requiredPlace: {fileID: 4955092343713333404}
@@ -9865,7 +9879,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2892268656417581477, guid: a47e18a66f4db0145b84244e1bf6b001, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6.8
+      value: 6.95
       objectReference: {fileID: 0}
     - target: {fileID: 2892268656417581477, guid: a47e18a66f4db0145b84244e1bf6b001, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9873,7 +9887,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2892268656417581477, guid: a47e18a66f4db0145b84244e1bf6b001, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5.33
+      value: -4.78
       objectReference: {fileID: 0}
     - target: {fileID: 2892268656417581477, guid: a47e18a66f4db0145b84244e1bf6b001, type: 3}
       propertyPath: m_LocalRotation.w
@@ -10609,7 +10623,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 13.01
+      value: 8.619999
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -10617,7 +10631,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.7200003
+      value: 3.46
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d0f5ca7e60a577c49adce1873ee9b59f, type: 3}
       propertyPath: m_LocalRotation.w

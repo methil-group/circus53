@@ -695,32 +695,37 @@ namespace Core
 
         private void PlayOnArrivalDialogues(Place place)
         {
-            if (place == null) return;
-
-            // On collecte les trois listes
-            var lines = new System.Collections.Generic.List<DialogLine>();
-            if (place.Dialogues != null) lines.AddRange(place.Dialogues);
-
-            // Clé ?
-            bool hasKey = _circusManager != null && _circusManager.HasKey;
-            if (hasKey && place.DialoguesWithKey != null) lines.AddRange(place.DialoguesWithKey);
-            else if (!hasKey && place.DialoguesNoKey != null) lines.AddRange(place.DialoguesNoKey);
-
-            if (lines.Count == 0) return;
+            if (place == null || place.Dialogues == null || place.Dialogues.Length == 0) return;
 
             if (_dialogChainRoutine != null)
                 StopCoroutine(_dialogChainRoutine);
 
-            _dialogChainRoutine = StartCoroutine(DialogChainRoutine(lines));
+            _dialogChainRoutine = StartCoroutine(DialogChainRoutine(place));
         }
 
-        private IEnumerator DialogChainRoutine(System.Collections.Generic.List<DialogLine> lines)
+        private IEnumerator DialogChainRoutine(Place place)
         {
             bool blocked = false;
+            bool hasKey = _circusManager != null && _circusManager.HasKey;
 
-            foreach (DialogLine line in lines)
+            foreach (DialogLine line in place.Dialogues)
             {
-                if (line.Trigger != DialogTrigger.OnArrival) continue;
+                // Filtrer par trigger
+                switch (line.Trigger)
+                {
+                    case DialogTrigger.OnArrival:
+                        // toujours joué
+                        break;
+                    case DialogTrigger.OnArrivalWithoutKey:
+                        if (hasKey) continue;
+                        break;
+                    case DialogTrigger.OnArrivalWithKey:
+                        if (!hasKey) continue;
+                        break;
+                    default:
+                        continue; // OnLook, Manual → ignorés ici
+                }
+
                 if (line.HasPlayed) continue;
                 if (string.IsNullOrWhiteSpace(line.Text)) continue;
 
@@ -734,7 +739,7 @@ namespace Core
                 }
 
                 DialogDisplayer.Instance?.Play(line);
-                Debug.Log($"[PlaceManager] Dialogue OnArrival : \"{line.Text}\"");
+                Debug.Log($"[PlaceManager] Dialogue OnArrival ({line.Trigger}) : \"{line.Text}\"");
 
                 if (DialogDisplayer.Instance != null)
                 {

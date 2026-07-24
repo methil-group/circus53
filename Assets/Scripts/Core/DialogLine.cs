@@ -6,6 +6,8 @@ namespace Core
     public enum DialogTrigger
     {
         OnArrival,
+        OnArrivalWithoutKey,
+        OnArrivalWithKey,
         OnLook,
         Manual
     }
