@@ -10,7 +10,7 @@ namespace Core
 {
     /// <summary>
     /// Porte : clic → vérifie si le joueur a la clé.
-    /// - Sans clé : joue un dialogue (texte + son).
+    /// - Sans clé : joue une chaîne de dialogues (texte + son).
     /// - Avec clé : charge la scène cible.
     /// Nécessite un Collider.
     /// </summary>
@@ -25,24 +25,14 @@ namespace Core
         [SerializeField, Tooltip("TMP_Text à remplir avec le texte du dialogue.")]
         private TMP_Text _dialogText;
 
-        [Header("Dialogue — sans clé")]
-        [SerializeField, TextArea(2, 6), Tooltip("Texte affiché quand le joueur n'a pas la clé.")]
-        private string _lockedText = "La porte est verrouillée... Il me faut une clé.";
+        [Header("Dialogues — sans clé")]
+        [SerializeField, Tooltip("Dialogues joués à la suite quand le joueur n'a pas la clé.")]
+        private DialogEntry[] _lockedDialogues;
 
-        [SerializeField, Tooltip("Mode d'apparition du texte.")]
-        private DialogReveal _revealMode = DialogReveal.CharByChar;
-
-        [SerializeField, Tooltip("Vitesse d'apparition (secondes par caractère ou par mot).")]
-        private float _revealSpeed = 0.05f;
-
-        [SerializeField, Tooltip("Durée d'affichage une fois le texte complet (secondes).")]
-        private float _displayDuration = 4f;
-
-        [SerializeField, Tooltip("Clip vocal à jouer.")]
-        private AudioClip _lockedVoiceClip;
-
+        [Header("Son global")]
+        [SerializeField, Tooltip("Volume global pour les voix.")]
         [Range(0f, 1f)]
-        [SerializeField] private float _volume = 1f;
+        private float _volume = 1f;
 
         [Header("Scène — avec clé")]
         [SerializeField, Tooltip("Build index de la scène à charger si le joueur a la clé.")]
@@ -57,7 +47,7 @@ namespace Core
         [SerializeField] private Outline[] _extraOutlines;
 
         [Header("Settings")]
-        [SerializeField, Tooltip("Si coché, jouable une seule fois (dialogue sans clé).")]
+        [SerializeField, Tooltip("Si coché, jouable une seule fois (dialogues sans clé).")]
         private bool _playOnce;
 
         [SerializeField, Tooltip("Cooldown entre deux clics (secondes).")]
@@ -230,11 +220,25 @@ namespace Core
         {
             if (_dialogPanel != null) _dialogPanel.SetActive(true);
 
-            PlayVoice(_lockedVoiceClip);
-            yield return StartCoroutine(RevealTextRoutine(_lockedText));
+            if (_lockedDialogues != null && _lockedDialogues.Length > 0)
+            {
+                for (int i = 0; i < _lockedDialogues.Length; i++)
+                {
+                    DialogEntry entry = _lockedDialogues[i];
+                    if (entry == null || string.IsNullOrWhiteSpace(entry.Text)) continue;
 
-            if (_displayDuration > 0f)
-                yield return new WaitForSeconds(_displayDuration);
+                    PlayVoice(entry.VoiceClip);
+                    yield return StartCoroutine(RevealTextRoutine(entry));
+
+                    if (entry.DisplayDuration > 0f)
+                        yield return new WaitForSeconds(entry.DisplayDuration);
+                }
+            }
+            else
+            {
+                // Fallback : un dialogue vide de 2 secondes
+                yield return new WaitForSeconds(2f);
+            }
 
             if (_dialogPanel != null) _dialogPanel.SetActive(false);
             if (_blockMovement) PlaceManager.Instance?.SetBlocked(false);
@@ -247,31 +251,29 @@ namespace Core
 
         private IEnumerator OpenDoorRoutine()
         {
-            // Petit délai pour le feedback
             yield return new WaitForSeconds(0.3f);
             SceneManager.LoadScene(_targetSceneBuildIndex);
         }
 
-        private IEnumerator RevealTextRoutine(string text)
+        private IEnumerator RevealTextRoutine(DialogEntry entry)
         {
             _dialogText.text = "";
 
-            // Démarrer le son de typing en boucle (pick aléatoire dans PlayerSounds.TypingSounds)
             StartTypingLoop();
 
-            switch (_revealMode)
+            switch (entry.RevealMode)
             {
                 case DialogReveal.Instant:
-                    _dialogText.text = text;
+                    _dialogText.text = entry.Text;
                     break;
 
                 case DialogReveal.CharByChar:
-                    foreach (char c in text) { _dialogText.text += c; yield return new WaitForSeconds(_revealSpeed); }
+                    foreach (char c in entry.Text) { _dialogText.text += c; yield return new WaitForSeconds(entry.RevealSpeed); }
                     break;
 
                 case DialogReveal.WordByWord:
-                    string[] words = text.Split(' ');
-                    for (int i = 0; i < words.Length; i++) { _dialogText.text += (i > 0 ? " " : "") + words[i]; yield return new WaitForSeconds(_revealSpeed); }
+                    string[] words = entry.Text.Split(' ');
+                    for (int i = 0; i < words.Length; i++) { _dialogText.text += (i > 0 ? " " : "") + words[i]; yield return new WaitForSeconds(entry.RevealSpeed); }
                     break;
             }
 

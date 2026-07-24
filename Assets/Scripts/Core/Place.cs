@@ -18,8 +18,16 @@ namespace Core
         [SerializeField, Tooltip("Direction dans laquelle le joueur regarde quand il est sur ce Place.")]
         private Vector3 _lookDirection = Vector3.forward;
 
-        [Header("Dialogues")]
+        [Header("Dialogues — OnArrival (toujours)")]
         [SerializeField] private DialogLine[] _dialogues = Array.Empty<DialogLine>();
+
+        [Header("Dialogues — OnArrival SANS clé")]
+        [SerializeField, Tooltip("Joués si le joueur n'a PAS la clé.")]
+        private DialogLine[] _dialoguesNoKey = Array.Empty<DialogLine>();
+
+        [Header("Dialogues — OnArrival AVEC clé")]
+        [SerializeField, Tooltip("Joués si le joueur a la clé.")]
+        private DialogLine[] _dialoguesWithKey = Array.Empty<DialogLine>();
 
         [Header("Ambiance")]
         [SerializeField, Tooltip("Son d'ambiance joué en boucle tant que le joueur est sur ce Place.")]
@@ -32,10 +40,13 @@ namespace Core
         public Place BackPlace => _backPlace;
         public Place LeftPlace => _leftPlace;
         public Place RightPlace => _rightPlace;
+
         [Header("Événements temporels")]
         [SerializeField] private PlaceEvent[] _events = Array.Empty<PlaceEvent>();
 
         public DialogLine[] Dialogues => _dialogues;
+        public DialogLine[] DialoguesNoKey => _dialoguesNoKey;
+        public DialogLine[] DialoguesWithKey => _dialoguesWithKey;
         public PlaceEvent[] Events => _events;
         public AudioClip AmbientSound => _ambientSound;
         public float ArrivalAnxietyIncrease => _arrivalAnxietyIncrease;

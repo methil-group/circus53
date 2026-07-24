@@ -695,19 +695,30 @@ namespace Core
 
         private void PlayOnArrivalDialogues(Place place)
         {
-            if (place == null || place.Dialogues == null || place.Dialogues.Length == 0) return;
+            if (place == null) return;
+
+            // On collecte les trois listes
+            var lines = new System.Collections.Generic.List<DialogLine>();
+            if (place.Dialogues != null) lines.AddRange(place.Dialogues);
+
+            // Clé ?
+            bool hasKey = _circusManager != null && _circusManager.HasKey;
+            if (hasKey && place.DialoguesWithKey != null) lines.AddRange(place.DialoguesWithKey);
+            else if (!hasKey && place.DialoguesNoKey != null) lines.AddRange(place.DialoguesNoKey);
+
+            if (lines.Count == 0) return;
 
             if (_dialogChainRoutine != null)
                 StopCoroutine(_dialogChainRoutine);
 
-            _dialogChainRoutine = StartCoroutine(DialogChainRoutine(place));
+            _dialogChainRoutine = StartCoroutine(DialogChainRoutine(lines));
         }
 
-        private IEnumerator DialogChainRoutine(Place place)
+        private IEnumerator DialogChainRoutine(System.Collections.Generic.List<DialogLine> lines)
         {
             bool blocked = false;
 
-            foreach (DialogLine line in place.Dialogues)
+            foreach (DialogLine line in lines)
             {
                 if (line.Trigger != DialogTrigger.OnArrival) continue;
                 if (line.HasPlayed) continue;
@@ -725,7 +736,6 @@ namespace Core
                 DialogDisplayer.Instance?.Play(line);
                 Debug.Log($"[PlaceManager] Dialogue OnArrival : \"{line.Text}\"");
 
-                // Attend que ce dialogue se termine
                 if (DialogDisplayer.Instance != null)
                 {
                     bool finished = false;

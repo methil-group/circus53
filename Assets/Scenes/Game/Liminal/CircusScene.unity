@@ -4965,7 +4965,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4247079702049199334, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1995.27
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4247079702049199334, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -4997,7 +4997,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5340344061202270541, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 817.85
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5340344061202270541, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -5025,7 +5025,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5690634833272500964, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1209.36
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5690634833272500964, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -5043,6 +5043,42 @@ PrefabInstance:
       propertyPath: m_Resource
       value: 
       objectReference: {fileID: 8300000, guid: c316e3063a177d448844b705e8ac90f4, type: 3}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[0].Text
+      value: the door is locked... i need a key.
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[1].Text
+      value: irma may have the answer
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[0].RevealMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[1].RevealMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[0].RevealSpeed
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[1].RevealSpeed
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[0].DisplayDuration
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926087768865257373, guid: f70480c298798c042b2a042dc643121d, type: 3}
+      propertyPath: _lockedDialogues.Array.data[1].DisplayDuration
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6212492107013190672, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -5053,7 +5089,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6212492107013190672, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 359.28
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6212492107013190672, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_SizeDelta.y
