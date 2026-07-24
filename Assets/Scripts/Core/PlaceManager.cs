@@ -697,8 +697,13 @@ namespace Core
         {
             if (place == null || place.Dialogues == null || place.Dialogues.Length == 0) return;
 
+            // Tuer l'ancienne chaîne et débloquer proprement
             if (_dialogChainRoutine != null)
+            {
                 StopCoroutine(_dialogChainRoutine);
+                _blockedByDialog = false;
+                RefreshButtons();
+            }
 
             _dialogChainRoutine = StartCoroutine(DialogChainRoutine(place));
         }

@@ -1434,7 +1434,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.AnxietyManager
   _maxAnxiety: 100
-  _increaseInterval: 5.25
+  _increaseInterval: 5
   _highAnxietyThreshold: 0.5
   _criticalAnxietyThreshold: 0.8
   _maxAnxietyLoopSound: {fileID: 0}
