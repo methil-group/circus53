@@ -14,8 +14,11 @@ namespace Core.Player
         [field: SerializeField] public AudioClip CallMomSound { get; private set; }
 
         [Header("Footsteps")]
-        [field: SerializeField] public AudioClip WalkOnGrass    { get; private set; }
-        [field: SerializeField] public AudioClip WalkOnDryGrass { get; private set; }
-        [field: SerializeField] public AudioClip WalkOnWetGrass { get; private set; }
+        [field: SerializeField, Tooltip("Sons de pas (un est choisi au hasard, joué en boucle quand le joueur marche).")]
+        public AudioClip[] WalkSounds { get; private set; }
+
+        [Header("Dialogue")]
+        [field: SerializeField, Tooltip("Sons de machine à écrire (un est choisi au hasard à chaque dialogue).")]
+        public AudioClip[] TypingSounds { get; private set; }
     }
 }

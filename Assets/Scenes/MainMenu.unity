@@ -895,6 +895,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 389654178118586901, guid: 930130b1872ffe842a0f1267be81f55c, type: 3}
+      propertyPath: m_TargetGraphic
+      value: 
+      objectReference: {fileID: 5284527472352487493}
+    - target: {fileID: 389654178118586901, guid: 930130b1872ffe842a0f1267be81f55c, type: 3}
       propertyPath: m_Colors.m_FadeDuration
       value: 0
       objectReference: {fileID: 0}
@@ -941,6 +945,10 @@ PrefabInstance:
     - target: {fileID: 3313827827434093302, guid: 930130b1872ffe842a0f1267be81f55c, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6008376859951048373, guid: 930130b1872ffe842a0f1267be81f55c, type: 3}
+      propertyPath: m_Sprite
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6008376859951048373, guid: 930130b1872ffe842a0f1267be81f55c, type: 3}
       propertyPath: m_Color.a
@@ -1109,6 +1117,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 797521653}
   m_SourcePrefab: {fileID: 100100000, guid: 930130b1872ffe842a0f1267be81f55c, type: 3}
+--- !u!114 &5284527472352487493 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6008376859951048373, guid: 930130b1872ffe842a0f1267be81f55c, type: 3}
+  m_PrefabInstance: {fileID: 5284527472352487492}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1840627640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

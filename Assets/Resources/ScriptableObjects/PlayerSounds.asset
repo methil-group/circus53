@@ -13,3 +13,11 @@ MonoBehaviour:
   m_Name: PlayerSounds
   m_EditorClassIdentifier: Assembly-CSharp::Core.Player.PlayerSounds
   <CallMomSound>k__BackingField: {fileID: 8300000, guid: 20381ffe305eea14b9fd46a78fd5f95c, type: 3}
+  <WalkSounds>k__BackingField:
+  - {fileID: 8300000, guid: 91ecdbc189f84c648af863c00932ff0f, type: 3}
+  - {fileID: 8300000, guid: 2f2b8d4f14e532b4d912094a9ae7f283, type: 3}
+  <TypingSounds>k__BackingField:
+  - {fileID: 8300000, guid: b306ecd15b6fbde4aa433e650d52c6af, type: 3}
+  - {fileID: 8300000, guid: 5c4691ae79f09cc4aad5bad5a2d73ab4, type: 3}
+  - {fileID: 8300000, guid: 70ec2abb85148bd42a0c5328f54501a2, type: 3}
+  - {fileID: 8300000, guid: 6541a5cd8ab0b4e4f99f16a8a40ed1d1, type: 3}

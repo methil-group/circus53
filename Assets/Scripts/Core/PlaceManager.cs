@@ -1,4 +1,5 @@
 using System.Collections;
+using Core.Player;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Events;
@@ -90,6 +91,13 @@ namespace Core
         private bool _blockedByDialog;
         private float _placeTimer;
 
+        // Ambient sound
+        private AudioSource _ambientAudioSource;
+        private AudioClip _currentAmbientClip;
+
+        // Footsteps
+        private AudioSource _walkAudioSource;
+
         // Live editor sync
         private Vector3 _lastPlacePosition;
         private Quaternion _lastPlaceRotation;
@@ -139,6 +147,18 @@ namespace Core
                 return;
             }
             Instance = this;
+
+            // AudioSource pour les sons d'ambiance des Places
+            _ambientAudioSource = gameObject.AddComponent<AudioSource>();
+            _ambientAudioSource.playOnAwake = false;
+            _ambientAudioSource.loop = true;
+            _ambientAudioSource.spatialBlend = 0f; // 2D
+
+            // AudioSource pour les pas
+            _walkAudioSource = gameObject.AddComponent<AudioSource>();
+            _walkAudioSource.playOnAwake = false;
+            _walkAudioSource.loop = true;
+            _walkAudioSource.spatialBlend = 0f; // 2D
 
             if (_navMeshAgent == null)
                 _navMeshAgent = FindAnyObjectByType<NavMeshAgent>();
@@ -200,6 +220,12 @@ namespace Core
 
                 // Jouer les dialogues OnArrival de la Place de départ
                 PlayOnArrivalDialogues(_currentPlace);
+
+                // Son d'ambiance de la Place de départ
+                PlayAmbientSound(_currentPlace);
+
+                // Anxiété de la Place de départ
+                ApplyArrivalAnxiety(_currentPlace);
 
                 Debug.Log($"[PlaceManager] Place de départ : '{_currentPlace.name}' " +
                     $"(pos: {_currentPlace.TargetPosition}, rot: {_currentPlace.LookRotation.eulerAngles})");
@@ -321,6 +347,7 @@ namespace Core
             _state = State.Walking;
             RefreshButtons();
             _onNavigationStarted?.Invoke();
+            StartWalkSound();
             Debug.Log($"[PlaceManager] GO -> '{_targetPlace.name}' " +
                 $"targetPos={destination} agentPos={_navMeshAgent.transform.position} " +
                 $"onNavMesh={_navMeshAgent.isOnNavMesh} navMeshOK={ok}");
@@ -442,6 +469,8 @@ namespace Core
 
         private void StartViewAlignment()
         {
+            StopWalkSound();
+
             _navMeshAgent.isStopped = true;
             _navMeshAgent.ResetPath();
 
@@ -489,6 +518,12 @@ namespace Core
 
             // Jouer les dialogues OnArrival de ce Place (une seule fois chacun)
             PlayOnArrivalDialogues(_currentPlace);
+
+            // Son d'ambiance
+            PlayAmbientSound(_currentPlace);
+
+            // Anxiété à l'arrivée
+            ApplyArrivalAnxiety(_currentPlace);
 
             // Init trackers pour le live sync
             _lastPlacePosition = _currentPlace.TargetPosition;
@@ -571,6 +606,40 @@ namespace Core
         private static float SmoothStep(float t)
         {
             return t * t * (3f - 2f * t);
+        }
+
+        // =======================================================================
+        // Ambient Sound
+        // =======================================================================
+
+        private void PlayAmbientSound(Place place)
+        {
+            AudioClip clip = place?.AmbientSound;
+
+            // Même son que celui déjà joué → ne rien faire
+            if (clip == _currentAmbientClip) return;
+
+            _currentAmbientClip = clip;
+
+            if (_ambientAudioSource == null) return;
+
+            _ambientAudioSource.Stop();
+
+            if (clip != null)
+            {
+                _ambientAudioSource.clip = clip;
+                _ambientAudioSource.Play();
+                Debug.Log($"[PlaceManager] 🔊 Ambiance : {clip.name}");
+            }
+        }
+
+        private void ApplyArrivalAnxiety(Place place)
+        {
+            if (place == null || place.ArrivalAnxietyIncrease <= 0f) return;
+            if (AnxietyManager.Instance == null) return;
+
+            AnxietyManager.Instance.IncreaseOverTime(place.ArrivalAnxietyIncrease, 2f);
+            Debug.Log($"[PlaceManager] Anxiété +{place.ArrivalAnxietyIncrease} à l'arrivée sur '{place.name}'");
         }
 
         // =======================================================================
@@ -851,6 +920,8 @@ namespace Core
 
         private void StopNavigation()
         {
+            StopWalkSound();
+
             _state = State.Idle;
             _targetPlace = null;
             _placeTimer = 0f;
@@ -860,6 +931,29 @@ namespace Core
                 _navMeshAgent.ResetPath();
             }
             Debug.Log("[PlaceManager] Navigation stoppée.");
+        }
+
+        // =======================================================================
+        // Walk Sound
+        // =======================================================================
+
+        private void StartWalkSound()
+        {
+            var sounds = PlayerSounds.Instance?.WalkSounds;
+            if (_walkAudioSource == null || sounds == null || sounds.Length == 0) return;
+
+            var clip = sounds[Random.Range(0, sounds.Length)];
+            _walkAudioSource.clip = clip;
+            _walkAudioSource.volume = 0.5f;
+            _walkAudioSource.Play();
+            Debug.Log($"[PlaceManager] 🔊 Pas : {clip.name}");
+        }
+
+        private void StopWalkSound()
+        {
+            if (_walkAudioSource == null) return;
+            _walkAudioSource.Stop();
+            _walkAudioSource.clip = null;
         }
     }
 }

@@ -170,9 +170,8 @@ namespace Core
         // =======================================================================
 
         /// <summary>
-        /// Augmente l'anxiété.
+        /// Augmente l'anxiété instantanément.
         /// </summary>
-        /// <param name="amount">Quantité à ajouter (positive).</param>
         public void Increase(float amount)
         {
             if (amount <= 0f) return;
@@ -184,9 +183,49 @@ namespace Core
 
             // Max anxiety reached
             if (NormalizedAnxiety >= 1f && !_hasTriggeredMax)
-            {
                 TriggerMaxAnxiety();
+        }
+
+        /// <summary>
+        /// Augmente l'anxiété progressivement sur une durée donnée (lerp fluide).
+        /// </summary>
+        public void IncreaseOverTime(float amount, float duration)
+        {
+            if (amount <= 0f || duration <= 0f) return;
+            StartCoroutine(IncreaseOverTimeRoutine(amount, duration));
+        }
+
+        private IEnumerator IncreaseOverTimeRoutine(float amount, float duration)
+        {
+            float startAnxiety = _currentAnxiety;
+            float targetAnxiety = Mathf.Min(startAnxiety + amount, _maxAnxiety);
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                // Ease in : lent au début, accélère à la fin (effet angoissant)
+                t = t * t;
+
+                _currentAnxiety = Mathf.Lerp(startAnxiety, targetAnxiety, t);
+
+                _onAnxietyChanged?.Invoke(NormalizedAnxiety);
+                CheckThresholds();
+
+                if (NormalizedAnxiety >= 1f && !_hasTriggeredMax)
+                    TriggerMaxAnxiety();
+
+                yield return null;
             }
+
+            // Snap final
+            _currentAnxiety = targetAnxiety;
+            _onAnxietyChanged?.Invoke(NormalizedAnxiety);
+            CheckThresholds();
+
+            if (NormalizedAnxiety >= 1f && !_hasTriggeredMax)
+                TriggerMaxAnxiety();
         }
 
         private void TriggerMaxAnxiety()
@@ -239,9 +278,8 @@ namespace Core
         }
 
         /// <summary>
-        /// Calme l'anxiété.
+        /// Calme l'anxiété instantanément.
         /// </summary>
-        /// <param name="amount">Quantité à retirer (positive).</param>
         public void Calm(float amount)
         {
             if (amount <= 0f) return;
@@ -251,12 +289,52 @@ namespace Core
 
             _onAnxietyChanged?.Invoke(NormalizedAnxiety);
 
-            // Si on redescend sous les seuils
             if (before >= _criticalAnxietyThreshold && NormalizedAnxiety < _criticalAnxietyThreshold)
-            {
                 _onAnxietyCalmed?.Invoke();
+
+            _wasHigh = IsHigh;
+            _wasCritical = IsCritical;
+        }
+
+        /// <summary>
+        /// Calme l'anxiété progressivement sur une durée donnée (lerp fluide).
+        /// </summary>
+        public void CalmOverTime(float amount, float duration)
+        {
+            if (amount <= 0f || duration <= 0f) return;
+            StartCoroutine(CalmOverTimeRoutine(amount, duration));
+        }
+
+        private IEnumerator CalmOverTimeRoutine(float amount, float duration)
+        {
+            float startAnxiety = _currentAnxiety;
+            float targetAnxiety = Mathf.Max(startAnxiety - amount, 0f);
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                // Ease out : rapide au début, ralentit à la fin
+                t = 1f - (1f - t) * (1f - t);
+
+                float before = NormalizedAnxiety;
+                _currentAnxiety = Mathf.Lerp(startAnxiety, targetAnxiety, t);
+
+                _onAnxietyChanged?.Invoke(NormalizedAnxiety);
+
+                if (before >= _criticalAnxietyThreshold && NormalizedAnxiety < _criticalAnxietyThreshold)
+                    _onAnxietyCalmed?.Invoke();
+
+                _wasHigh = IsHigh;
+                _wasCritical = IsCritical;
+
+                yield return null;
             }
 
+            // Snap final
+            _currentAnxiety = targetAnxiety;
+            _onAnxietyChanged?.Invoke(NormalizedAnxiety);
             _wasHigh = IsHigh;
             _wasCritical = IsCritical;
         }

@@ -9,6 +9,9 @@ namespace Core
     {
         [SerializeField] private List<Place> _places = new();
 
+        /// <summary>True si le joueur possède la clé.</summary>
+        public bool HasKey { get; set; }
+
         public void SelectPlace(Place selectedPlace)
         {
             if (selectedPlace == null) return;

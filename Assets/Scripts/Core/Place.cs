@@ -21,6 +21,13 @@ namespace Core
         [Header("Dialogues")]
         [SerializeField] private DialogLine[] _dialogues = Array.Empty<DialogLine>();
 
+        [Header("Ambiance")]
+        [SerializeField, Tooltip("Son d'ambiance joué en boucle tant que le joueur est sur ce Place.")]
+        private AudioClip _ambientSound;
+
+        [SerializeField, Tooltip("Anxiété ajoutée à l'arrivée sur ce Place.")]
+        private float _arrivalAnxietyIncrease;
+
         public Place FrontPlace => _frontPlace;
         public Place BackPlace => _backPlace;
         public Place LeftPlace => _leftPlace;
@@ -30,6 +37,8 @@ namespace Core
 
         public DialogLine[] Dialogues => _dialogues;
         public PlaceEvent[] Events => _events;
+        public AudioClip AmbientSound => _ambientSound;
+        public float ArrivalAnxietyIncrease => _arrivalAnxietyIncrease;
 
         /// <summary>Position cible pour le joueur (venant du CameraClickPoint).</summary>
         public Vector3 TargetPosition => transform.position;

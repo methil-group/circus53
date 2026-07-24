@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Game/Liminal/CircusScene.unity
     guid: f9c58143820830947a361d0e1c8ef237
   - enabled: 1
+    path: Assets/Scenes/EndScreen.unity
+    guid: 983ed6d2588665942984843038ee47da
+  - enabled: 1
     path: Assets/Scenes/Game/Overworld/MagicTent.unity
     guid: cb7e4abd89417c044ade81ff2529789c
   m_configObjects:

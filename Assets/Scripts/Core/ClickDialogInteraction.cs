@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+using Core.Player;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -10,7 +10,7 @@ namespace Core
     /// <summary>
     /// Entrée de dialogue : un texte, ses réglages d'affichage et un son optionnel.
     /// </summary>
-    [Serializable]
+    [System.Serializable]
     public class DialogEntry
     {
         [TextArea(2, 6)]
@@ -82,9 +82,20 @@ namespace Core
         [SerializeField, Tooltip("Si coché, bloque les déplacements du joueur pendant l'interaction.")]
         private bool _blockMovement = true;
 
+        [SerializeField, Tooltip("Si coché, donne la clé au joueur à la fin de l'interaction.")]
+        private bool _giveKeyOnComplete;
+
+        [Header("Anxiété")]
+        [SerializeField, Tooltip("Quantité d'anxiété ajoutée ou retirée à la fin de l'interaction (> 0 = stresse, < 0 = calme, 0 = pas d'effet).")]
+        private float _anxietyChange;
+
+        [SerializeField, Tooltip("Durée sur laquelle l'anxiété est modifiée (secondes, 0 = instantané).")]
+        private float _anxietyDuration = 2f;
+
         // ===================================================================
 
         private AudioSource _audioSource;
+        private AudioSource _typingAudioSource;
         private Coroutine _routine;
         private bool _hasPlayed;
         private bool _isPlaying;
@@ -102,6 +113,12 @@ namespace Core
         {
             _audioSource = GetComponent<AudioSource>();
             _collider = GetComponent<Collider>();
+
+            // AudioSource secondaire pour le typing sound (pas de spatialisation)
+            _typingAudioSource = gameObject.AddComponent<AudioSource>();
+            _typingAudioSource.playOnAwake = false;
+            _typingAudioSource.loop = false;
+            _typingAudioSource.spatialBlend = 0f;
 
             if (_dialogPanel != null)
                 _dialogPanel.SetActive(false);
@@ -244,14 +261,22 @@ namespace Core
             if (_audioSource != null)
                 _audioSource.Stop();
 
+            // Couper le typing
+            StopTypingLoop();
+
             // Désactiver le panneau
             if (_dialogPanel != null)
                 _dialogPanel.SetActive(false);
 
             // Débloquer les déplacements
-            // Débloquer les déplacements
             if (_blockMovement)
                 PlaceManager.Instance?.SetBlocked(false);
+
+            // Donner la clé
+            TryGiveKey();
+
+            // Anxiété
+            TryApplyAnxiety();
 
             _isPlaying = false;
 
@@ -308,6 +333,47 @@ namespace Core
             return true;
         }
 
+        private void TryGiveKey()
+        {
+            if (!_giveKeyOnComplete) return;
+
+            var cm = FindAnyObjectByType<CircusManager>();
+            if (cm != null)
+            {
+                cm.HasKey = true;
+                Debug.Log("[ClickDialogInteraction] Clé donnée au joueur.");
+            }
+        }
+
+        private void TryApplyAnxiety()
+        {
+            if (_anxietyChange == 0f) return;
+            if (AnxietyManager.Instance == null) return;
+
+            float amount = Mathf.Abs(_anxietyChange);
+
+            if (_anxietyChange > 0f)
+            {
+                // Stresse
+                if (_anxietyDuration > 0f)
+                    AnxietyManager.Instance.IncreaseOverTime(amount, _anxietyDuration);
+                else
+                    AnxietyManager.Instance.Increase(amount);
+
+                Debug.Log($"[ClickDialogInteraction] Anxiété augmentée de {amount} en {_anxietyDuration}s.");
+            }
+            else
+            {
+                // Calme
+                if (_anxietyDuration > 0f)
+                    AnxietyManager.Instance.CalmOverTime(amount, _anxietyDuration);
+                else
+                    AnxietyManager.Instance.Calm(amount);
+
+                Debug.Log($"[ClickDialogInteraction] Anxiété calmée de {amount} en {_anxietyDuration}s.");
+            }
+        }
+
         // ===================================================================
         // Routine
         // ===================================================================
@@ -349,9 +415,14 @@ namespace Core
                 _dialogPanel.SetActive(false);
 
             // Débloquer les déplacements
-            // Débloquer les déplacements
             if (_blockMovement)
                 PlaceManager.Instance?.SetBlocked(false);
+
+            // Donner la clé
+            TryGiveKey();
+
+            // Anxiété
+            TryApplyAnxiety();
 
             _isPlaying = false;
             _routine = null;
@@ -367,6 +438,9 @@ namespace Core
         private IEnumerator RevealTextRoutine(DialogEntry entry)
         {
             _dialogText.text = "";
+
+            // Démarrer le son de typing en boucle (pick aléatoire dans PlayerSounds.TypingSounds)
+            StartTypingLoop();
 
             switch (entry.RevealMode)
             {
@@ -391,12 +465,40 @@ namespace Core
                     }
                     break;
             }
+
+            // Arrêter le son de typing
+            StopTypingLoop();
         }
 
         private void PlayVoice(AudioClip clip)
         {
             if (_audioSource == null || clip == null) return;
             _audioSource.PlayOneShot(clip, _volume);
+        }
+
+        private void StartTypingLoop()
+        {
+            var sounds = PlayerSounds.Instance?.TypingSounds;
+            if (_typingAudioSource == null || sounds == null || sounds.Length == 0)
+            {
+                Debug.LogWarning($"[ClickDialogInteraction] StartTypingLoop ignoré : source={_typingAudioSource != null}, sounds={sounds?.Length ?? 0}");
+                return;
+            }
+
+            var clip = sounds[Random.Range(0, sounds.Length)];
+            Debug.Log($"[ClickDialogInteraction] ▶ Typing loop : {clip.name}");
+            _typingAudioSource.clip = clip;
+            _typingAudioSource.loop = true;
+            _typingAudioSource.volume = 0.6f;
+            _typingAudioSource.Play();
+        }
+
+        private void StopTypingLoop()
+        {
+            if (_typingAudioSource == null) return;
+            Debug.Log("[ClickDialogInteraction] ⏹ Typing loop stopped");
+            _typingAudioSource.Stop();
+            _typingAudioSource.clip = null;
         }
 
         // ===================================================================
