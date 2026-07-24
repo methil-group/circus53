@@ -22,3 +22,5 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 70ec2abb85148bd42a0c5328f54501a2, type: 3}
   - {fileID: 8300000, guid: 6541a5cd8ab0b4e4f99f16a8a40ed1d1, type: 3}
   <GlobalAmbientSound>k__BackingField: {fileID: 8300000, guid: 7c64f3548e49c7e4c8c101934274abd8, type: 3}
+  <RandomAmbientSounds>k__BackingField:
+  - {fileID: 8300000, guid: 0870e78f728788148883568e6799d708, type: 3}

@@ -1,10 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using Core.Player;
 using UnityEngine;
 
 namespace Core
 {
-    /// <summary>Centralise les états de décor associés aux différents Place du circus.</summary>
     [DisallowMultipleComponent]
     public class CircusManager : MonoBehaviour
     {
@@ -15,7 +15,13 @@ namespace Core
 
         // =======================================================================
 
+        [Header("Random Ambient")]
+        [SerializeField, Tooltip("Volume des sons d'ambiance aléatoires.")]
+        [Range(0f, 1f)]
+        private float _randomAmbientVolume = 0.4f;
+
         private AudioSource _globalAmbientSource;
+        private AudioSource _randomAmbientSource;
 
         private void Start()
         {
@@ -32,6 +38,34 @@ namespace Core
                 _globalAmbientSource.Play();
                 Debug.Log($"[CircusManager] 🌍 Ambiance globale : {clip.name}");
             }
+
+            // Ambiances aléatoires
+            var randomSounds = PlayerSounds.Instance?.RandomAmbientSounds;
+            if (randomSounds != null && randomSounds.Length > 0)
+            {
+                _randomAmbientSource = gameObject.AddComponent<AudioSource>();
+                _randomAmbientSource.playOnAwake = false;
+                _randomAmbientSource.loop = false;
+                _randomAmbientSource.spatialBlend = 0f;
+                _randomAmbientSource.volume = _randomAmbientVolume;
+
+                StartCoroutine(RandomAmbientRoutine(randomSounds));
+            }
+        }
+
+        private IEnumerator RandomAmbientRoutine(AudioClip[] sounds)
+        {
+            while (true)
+            {
+                // Intervalle aléatoire entre 45s et 60s
+                float interval = Random.Range(45f, 60f);
+                yield return new WaitForSeconds(interval);
+
+                var clip = sounds[Random.Range(0, sounds.Length)];
+                _randomAmbientSource.clip = clip;
+                _randomAmbientSource.Play();
+                Debug.Log($"[CircusManager] 🎲 Ambiance aléatoire : {clip.name}");
+            }
         }
 
         // =======================================================================
@@ -42,7 +76,6 @@ namespace Core
             Debug.Log($"[CircusManager] Endroit sélectionné : {selectedPlace.name}");
         }
 
-        /// <summary>Ajoute les Place manquants sans modifier la configuration existante.</summary>
         public void AddMissingPlaces(IEnumerable<Place> places)
         {
             foreach (Place place in places)

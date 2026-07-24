@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace Core.Player
 {
-    /// <summary>
-    /// Singleton ScriptableObject contenant tous les sons du joueur.
-    /// L'asset doit être placé dans un dossier Resources/ (ex: Resources/ScriptableObjects/).
-    /// </summary>
     [CreateAssetMenu(menuName = "Dream/Jam/Player Sounds")]
     public class PlayerSounds : SingletonScriptableObject<PlayerSounds>
     {
@@ -24,5 +20,8 @@ namespace Core.Player
         [Header("Ambiance")]
         [field: SerializeField, Tooltip("Ambiance globale jouée en boucle dans la scène du circus.")]
         public AudioClip GlobalAmbientSound { get; private set; }
+
+        [field: SerializeField, Tooltip("Sons d'ambiance aléatoires joués à intervalles irréguliers.")]
+        public AudioClip[] RandomAmbientSounds { get; private set; }
     }
 }

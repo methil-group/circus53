@@ -458,6 +458,7 @@ MonoBehaviour:
   _onNavigationComplete:
     m_PersistentCalls:
       m_Calls: []
+  _ambientFadeDuration: 1
 --- !u!114 &125493216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,6 +472,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Core.CircusManager
   _places: []
+  _randomAmbientVolume: 0.4
 --- !u!1 &233366550
 GameObject:
   m_ObjectHideFlags: 0
@@ -5040,7 +5042,7 @@ PrefabInstance:
     - target: {fileID: 5720602323730803113, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_Resource
       value: 
-      objectReference: {fileID: 8300000, guid: a3033b852d9fc6b458e441d998e53d7c, type: 3}
+      objectReference: {fileID: 8300000, guid: c316e3063a177d448844b705e8ac90f4, type: 3}
     - target: {fileID: 6212492107013190672, guid: f70480c298798c042b2a042dc643121d, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
