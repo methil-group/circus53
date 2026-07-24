@@ -94,6 +94,11 @@ namespace Core
         // Ambient sound
         private AudioSource _ambientAudioSource;
         private AudioClip _currentAmbientClip;
+        private Coroutine _ambientFadeRoutine;
+
+        [Header("Ambient Fade")]
+        [SerializeField, Tooltip("Durée du fade in / fade out des sons d'ambiance (secondes).")]
+        private float _ambientFadeDuration = 1f;
 
         // Footsteps
         private AudioSource _walkAudioSource;
@@ -623,14 +628,54 @@ namespace Core
 
             if (_ambientAudioSource == null) return;
 
-            _ambientAudioSource.Stop();
+            // Stop la coroutine de fade précédente
+            if (_ambientFadeRoutine != null)
+                StopCoroutine(_ambientFadeRoutine);
 
-            if (clip != null)
+            _ambientFadeRoutine = StartCoroutine(AmbientFadeRoutine(clip));
+        }
+
+        private IEnumerator AmbientFadeRoutine(AudioClip newClip)
+        {
+            float fadeDuration = _ambientFadeDuration;
+
+            // Fade out du son actuel
+            if (_ambientAudioSource.isPlaying)
             {
-                _ambientAudioSource.clip = clip;
-                _ambientAudioSource.Play();
-                Debug.Log($"[PlaceManager] 🔊 Ambiance : {clip.name}");
+                float startVolume = _ambientAudioSource.volume;
+                float elapsed = 0f;
+                while (elapsed < fadeDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    _ambientAudioSource.volume = Mathf.Lerp(startVolume, 0f, elapsed / fadeDuration);
+                    yield return null;
+                }
+                _ambientAudioSource.Stop();
+                _ambientAudioSource.clip = null;
             }
+
+            if (newClip == null)
+            {
+                _ambientFadeRoutine = null;
+                yield break;
+            }
+
+            // Nouveau son : fade in
+            _ambientAudioSource.clip = newClip;
+            _ambientAudioSource.volume = 0f;
+            _ambientAudioSource.Play();
+            Debug.Log($"[PlaceManager] 🔊 Ambiance : {newClip.name}");
+
+            float elapsedIn = 0f;
+            while (elapsedIn < fadeDuration)
+            {
+                elapsedIn += Time.deltaTime;
+                _ambientAudioSource.volume = Mathf.Lerp(0f, 1f, elapsedIn / fadeDuration);
+                yield return null;
+            }
+            _ambientAudioSource.volume = 1f;
+
+            _ambientFadeRoutine = null;
         }
 
         private void ApplyArrivalAnxiety(Place place)
