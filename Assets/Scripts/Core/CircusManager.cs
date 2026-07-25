@@ -57,8 +57,8 @@ namespace Core
         {
             while (true)
             {
-                // Intervalle aléatoire entre 45s et 60s
-                float interval = Random.Range(45f, 60f);
+                // Intervalle aléatoire entre 1m30s et 2m
+                float interval = Random.Range(90f, 120f);
                 yield return new WaitForSeconds(interval);
 
                 var clip = sounds[Random.Range(0, sounds.Length)];
