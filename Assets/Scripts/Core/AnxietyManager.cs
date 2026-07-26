@@ -269,7 +269,7 @@ namespace Core
                 // Changement de scène
                 if (elapsed >= _sceneChangeDelay)
                 {
-                    SceneManager.LoadScene(_targetSceneBuildIndex);
+                    SceneTransitionManager.LoadScene(_targetSceneBuildIndex);
                     yield break;
                 }
 

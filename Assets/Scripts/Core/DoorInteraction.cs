@@ -56,6 +56,10 @@ namespace Core
         [SerializeField, Tooltip("Si coché, bloque les déplacements pendant l'interaction.")]
         private bool _blockMovement = true;
 
+        [Header("Typing Sound")]
+        [SerializeField, Tooltip("Qui parle ? Other = autres personnages.")]
+        private TypingVoice _typingVoice = TypingVoice.Other;
+
         // ===================================================================
 
         private AudioSource _audioSource;
@@ -252,7 +256,7 @@ namespace Core
         private IEnumerator OpenDoorRoutine()
         {
             yield return new WaitForSeconds(0.3f);
-            SceneManager.LoadScene(_targetSceneBuildIndex);
+            SceneTransitionManager.LoadScene(_targetSceneBuildIndex);
         }
 
         private IEnumerator RevealTextRoutine(DialogEntry entry)
@@ -288,10 +292,13 @@ namespace Core
 
         private void StartTypingLoop()
         {
-            var sounds = PlayerSounds.Instance?.TypingSounds;
+            var sounds = _typingVoice == TypingVoice.Player
+                ? PlayerSounds.Instance?.PlayerTypingSounds
+                : PlayerSounds.Instance?.OtherTypingSounds;
+
             if (_typingAudioSource == null || sounds == null || sounds.Length == 0)
             {
-                Debug.LogWarning($"[DoorInteraction] StartTypingLoop ignoré : source={_typingAudioSource != null}, sounds={sounds?.Length ?? 0}");
+                Debug.LogWarning($"[DoorInteraction] StartTypingLoop ignoré : source={_typingAudioSource != null}, sounds={sounds?.Length ?? 0}, voice={_typingVoice}");
                 return;
             }
 

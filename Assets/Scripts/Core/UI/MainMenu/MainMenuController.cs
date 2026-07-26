@@ -1,15 +1,10 @@
-using Core.Scene;
-using Framework.Controller;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
 namespace Core.UI.MainMenu
 {
-    public class MainMenuController : BaseController<MainMenuController>
+    public class MainMenuController : Framework.Controller.BaseController<MainMenuController>
     {
         public void LaunchGame()
         {
-            SceneManager.LoadScene(2);
+            SceneTransitionManager.LoadScene(2);
         }
     }
 }

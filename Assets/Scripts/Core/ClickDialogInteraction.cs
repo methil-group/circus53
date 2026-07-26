@@ -92,6 +92,10 @@ namespace Core
         [SerializeField, Tooltip("Durée sur laquelle l'anxiété est modifiée (secondes, 0 = instantané).")]
         private float _anxietyDuration = 2f;
 
+        [Header("Typing Sound")]
+        [SerializeField, Tooltip("Qui parle ? Player = sons du joueur, Other = sons des autres personnages.")]
+        private TypingVoice _typingVoice = TypingVoice.Other;
+
         // ===================================================================
 
         private AudioSource _audioSource;
@@ -478,10 +482,13 @@ namespace Core
 
         private void StartTypingLoop()
         {
-            var sounds = PlayerSounds.Instance?.TypingSounds;
+            var sounds = _typingVoice == TypingVoice.Player
+                ? PlayerSounds.Instance?.PlayerTypingSounds
+                : PlayerSounds.Instance?.OtherTypingSounds;
+
             if (_typingAudioSource == null || sounds == null || sounds.Length == 0)
             {
-                Debug.LogWarning($"[ClickDialogInteraction] StartTypingLoop ignoré : source={_typingAudioSource != null}, sounds={sounds?.Length ?? 0}");
+                Debug.LogWarning($"[ClickDialogInteraction] StartTypingLoop ignoré : source={_typingAudioSource != null}, sounds={sounds?.Length ?? 0}, voice={_typingVoice}");
                 return;
             }
 

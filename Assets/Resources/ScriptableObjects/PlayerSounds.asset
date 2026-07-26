@@ -17,11 +17,16 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 7ce07b5b568090c4dac74a7d6afc009f, type: 3}
   - {fileID: 8300000, guid: 8a655592914825e439b062910580aa00, type: 3}
   - {fileID: 8300000, guid: 6d6db5c14f94f6d46a2dca5baa7a081c, type: 3}
-  <TypingSounds>k__BackingField:
+  <PlayerTypingSounds>k__BackingField:
   - {fileID: 8300000, guid: b306ecd15b6fbde4aa433e650d52c6af, type: 3}
   - {fileID: 8300000, guid: 5c4691ae79f09cc4aad5bad5a2d73ab4, type: 3}
   - {fileID: 8300000, guid: 70ec2abb85148bd42a0c5328f54501a2, type: 3}
   - {fileID: 8300000, guid: 6541a5cd8ab0b4e4f99f16a8a40ed1d1, type: 3}
+  <OtherTypingSounds>k__BackingField:
+  - {fileID: 8300000, guid: ada926b9f1aff1d4f8b1c8cbb1e94737, type: 3}
+  - {fileID: 8300000, guid: 90e5050d1451874419151c8159d017ca, type: 3}
+  - {fileID: 8300000, guid: 70a3b666b64512c4db01383a98b2d2f5, type: 3}
+  - {fileID: 8300000, guid: 2133c8e6014017645b557762ddcc7832, type: 3}
   <GlobalAmbientSound>k__BackingField: {fileID: 8300000, guid: 158b9806cad01e24ea807e88b16e2bee, type: 3}
   <RandomAmbientSounds>k__BackingField:
   - {fileID: 8300000, guid: 0870e78f728788148883568e6799d708, type: 3}

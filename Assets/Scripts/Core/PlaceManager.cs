@@ -701,6 +701,7 @@ namespace Core
             if (_dialogChainRoutine != null)
             {
                 StopCoroutine(_dialogChainRoutine);
+                DialogDisplayer.Instance?.Skip();
                 _blockedByDialog = false;
                 RefreshButtons();
             }

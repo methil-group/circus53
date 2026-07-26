@@ -98,6 +98,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 3
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -198,6 +199,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -299,6 +301,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 3
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -399,6 +402,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -499,6 +503,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -599,6 +604,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 3.5
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -902,6 +908,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 2
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -1002,6 +1009,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -1102,6 +1110,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2.5
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -1202,6 +1211,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 4
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: -15
@@ -1308,6 +1318,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -1322,6 +1333,7 @@ MonoBehaviour:
       RevealSpeed: 0.03
       DisplayDuration: 4
       BlockMovement: 1
+      Voice: 0
       Sound: {fileID: 0}
     OnTrigger:
       m_PersistentCalls:
@@ -1768,6 +1780,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -2092,6 +2105,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -2285,6 +2299,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -2691,6 +2706,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -2791,6 +2807,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -2891,6 +2908,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 2
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -2991,6 +3009,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -3209,6 +3228,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2.5
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -3310,6 +3330,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2.5
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -3410,6 +3431,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -3802,6 +3824,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 3
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -3903,6 +3926,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -4513,6 +4537,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 4
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -4614,6 +4639,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -4808,6 +4834,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -5129,6 +5156,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -5367,7 +5395,8 @@ Transform:
   m_LocalPosition: {x: 435.892, y: 43.885, z: 343.707}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 3098921398325344140}
   m_Father: {fileID: 9168447310730494759}
   m_LocalEulerAnglesHint: {x: 0, y: -36.043, z: 0}
 --- !u!65 &1849482574454539303
@@ -5524,6 +5553,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 3
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   - Text: i need to go find the door...
     Trigger: 2
@@ -5532,6 +5562,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 3
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -5632,6 +5663,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   - Text: i told mom that i was stressed to go on stage...
     Trigger: 0
@@ -5640,6 +5672,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 3
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   - Text: why is everyone not here...
     Trigger: 0
@@ -5648,6 +5681,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   - Text: im feeling weird here... i should go home...
     Trigger: 0
@@ -5656,6 +5690,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 3
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   - Text: fast...
     Trigger: 0
@@ -5664,6 +5699,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 1.3
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -5867,6 +5903,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -6274,6 +6311,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 4
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 8300000, guid: c8f90e3cae13b89488255633144f2d67, type: 3}
   _arrivalAnxietyIncrease: 10
@@ -6695,6 +6733,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 2
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -6795,6 +6834,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 3.5
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   - Text: and there is... nothing.
     Trigger: 0
@@ -6803,6 +6843,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 3.5
     BlockMovement: 1
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 8300000, guid: 156c959a1fdb7d64a8caa480102fb326, type: 3}
   _arrivalAnxietyIncrease: 0
@@ -7430,6 +7471,7 @@ MonoBehaviour:
     RevealSpeed: 0.03
     DisplayDuration: 2
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -7531,6 +7573,7 @@ MonoBehaviour:
     RevealSpeed: 0.05
     DisplayDuration: 4
     BlockMovement: 0
+    Voice: 0
     Sound: {fileID: 0}
   _ambientSound: {fileID: 0}
   _arrivalAnxietyIncrease: 0
@@ -7962,6 +8005,7 @@ MonoBehaviour:
   _giveKeyOnComplete: 0
   _anxietyChange: 0
   _anxietyDuration: 2
+  _typingVoice: 1
 --- !u!1001 &379077786614910432
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8197,6 +8241,7 @@ MonoBehaviour:
   _giveKeyOnComplete: 0
   _anxietyChange: 0
   _anxietyDuration: 2
+  _typingVoice: 1
 --- !u!114 &4842843219546370705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8460,6 +8505,7 @@ MonoBehaviour:
   _giveKeyOnComplete: 0
   _anxietyChange: 0
   _anxietyDuration: 2
+  _typingVoice: 1
 --- !u!114 &6470970201949104461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8746,6 +8792,7 @@ MonoBehaviour:
   _giveKeyOnComplete: 0
   _anxietyChange: 0
   _anxietyDuration: 2
+  _typingVoice: 1
 --- !u!114 &6629944687249517155
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9243,6 +9290,7 @@ MonoBehaviour:
   _giveKeyOnComplete: 1
   _anxietyChange: 0
   _anxietyDuration: 2
+  _typingVoice: 1
 --- !u!114 &6529058210879777255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9769,6 +9817,73 @@ MonoBehaviour:
   _playOnce: 0
   _cooldown: 0
   _blockMovement: 1
+  _typingVoice: 1
+--- !u!1001 &3209709645441831015
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7412934191734110250}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 13.08
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -3.74
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5.92
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.7551278
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.6555777
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 278.073
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: f6287fb34f0a52f4c9544f0c62119f5f, type: 2}
+    - target: {fileID: 919132149155446097, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+      propertyPath: m_Name
+      value: pancarte (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+--- !u!4 &3098921398325344140 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
+  m_PrefabInstance: {fileID: 3209709645441831015}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3272452442933953870
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10215,6 +10330,7 @@ MonoBehaviour:
   _giveKeyOnComplete: 0
   _anxietyChange: 0
   _anxietyDuration: 2
+  _typingVoice: 1
 --- !u!65 &6558860433854662813
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10234,8 +10350,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4.49, y: 8.03, z: 2.62}
-  m_Center: {x: -1.91, y: 2.36, z: 4.27}
+  m_Size: {x: 4.4899993, y: 8.537893, z: 3.216496}
+  m_Center: {x: -1.9099866, y: 2.6139462, z: 3.971773}
 --- !u!1 &8321813724229610921 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5667775197197964161, guid: a47e18a66f4db0145b84244e1bf6b001, type: 3}
@@ -10677,7 +10793,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.8899994
+      value: -1.85
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5f3c9fef3869f5c42ae8a31bf727b355, type: 3}
       propertyPath: m_LocalPosition.z
@@ -10954,6 +11070,7 @@ MonoBehaviour:
   _giveKeyOnComplete: 0
   _anxietyChange: 0
   _anxietyDuration: 2
+  _typingVoice: 1
 --- !u!114 &5697090103474445800
 MonoBehaviour:
   m_ObjectHideFlags: 0

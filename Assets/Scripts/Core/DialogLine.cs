@@ -19,6 +19,13 @@ namespace Core
         WordByWord
     }
 
+    /// <summary>Qui parle ? Détermine le son de typing utilisé.</summary>
+    public enum TypingVoice
+    {
+        Player,
+        Other
+    }
+
     [Serializable]
     public class DialogLine
     {
@@ -35,7 +42,7 @@ namespace Core
         public DialogReveal Reveal = DialogReveal.Instant;
 
         [Tooltip("Vitesse d'apparition (secondes par caractère ou par mot).")]
-        public float RevealSpeed = 0.03f;
+        public float RevealSpeed = 0.05f;
 
         [Tooltip("Durée d'affichage une fois le texte complet (0 = reste affiché).")]
         public float DisplayDuration = 4f;
@@ -43,8 +50,12 @@ namespace Core
         [Tooltip("Bloque la navigation tant que le dialogue est visible.")]
         public bool BlockMovement = true;
 
+        [Header("Voice")]
+        [Tooltip("Qui parle ? Détermine le typing sound.")]
+        public TypingVoice Voice = TypingVoice.Player;
+
         [Header("Sound")]
-        [Tooltip("Son optionnel (pas encore implémenté).")]
+        [Tooltip("Son optionnel.")]
         public AudioClip Sound;
 
         [NonSerialized] public bool HasPlayed;
