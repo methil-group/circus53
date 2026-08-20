@@ -8,8 +8,8 @@ Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 illum 1
-map_Kd visorcolor.png
-map_d visorcolor.png
+map_Kd PEN_BETA2.png
+map_d PEN_BETA2.png
 
 newmtl attach_00008864_material_0
 Ns 250.000000

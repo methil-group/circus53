@@ -131,6 +131,12 @@ Packages/packages-lock.json linguist-generated
 *.png                   lfs
 *.psd                   lfs
 *.tga                   lfs
+
+# Unity native binary assets. They must never be normalized as text because
+# TerrainData and NavMeshData are serialized in a binary NativeFormat.
+Assets/**/TerrainData_*.asset -text -eol -diff -merge
+Assets/**/NavMesh-*.asset -text -eol -diff -merge
+"Assets/New Terrain.asset" -text -eol -diff -merge
 *.tif                   lfs
 *.tiff                  lfs
 *.webp                  lfs

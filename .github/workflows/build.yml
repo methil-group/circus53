@@ -20,6 +20,8 @@ jobs:
       # Récupère le code source
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       # Cache de la bibliothèque Unity pour accélérer les builds
       - name: Cache Unity Library
